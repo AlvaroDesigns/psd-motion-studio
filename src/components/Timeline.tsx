@@ -593,7 +593,10 @@ export const Timeline: React.FC<TimelineProps> = ({
                 </div>
               ))}
             </div>
-            <div className="am-timeline-ruler" onMouseDown={handleRulerMouseDown}>
+            <div
+              className="am-timeline-ruler"
+              onMouseDown={handleRulerMouseDown}
+            >
               {frameTicks.map((frame) => {
                 const sec = frame / fps;
                 return (

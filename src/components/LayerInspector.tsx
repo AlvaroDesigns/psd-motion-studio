@@ -550,8 +550,10 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
                   <div style={{ display: 'flex', gap: 6 }}>
                     {[
                       { name: 'Verde Movent', hex: '#23C83C' },
+                      { name: 'Verde Ácido', hex: '#39ff14' },
                       { name: 'Cian Eléctrico', hex: '#00f0ff' },
                       { name: 'Rosa Neón', hex: '#f72585' },
+                      { name: 'Morado Neón', hex: '#a855f7' },
                       { name: 'Oro Brillante', hex: '#ffd166' },
                       { name: 'Blanco Flash', hex: '#ffffff' },
                     ].map((c) => (

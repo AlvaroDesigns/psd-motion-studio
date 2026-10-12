@@ -26,6 +26,12 @@ import {
   Play,
 } from 'lucide-react';
 
+const NEON_TEMPLATE_IDS = [
+  'neon_cyber_glow',
+  'neon_acid_toxic',
+  'neon_nightclub_vip',
+];
+
 const FESTIVAL_TEMPLATE_IDS = [
   'festival_rave',
   'techno_warehouse',
@@ -275,11 +281,18 @@ export function App() {
             <select
               id="am-template-select"
               className="am-select"
-              style={{ width: 260, height: 28, fontSize: 11 }}
+              style={{ width: 275, height: 28, fontSize: 11 }}
               value={selectedTemplateId}
               onChange={(e) => handleApplyTemplate(e.target.value)}
             >
               <option value="" disabled>Seleccionar Plantilla...</option>
+              <optgroup label="💡 EFECTO NEÓN & CYBER GLOW">
+                {MOTION_TEMPLATES.filter((t) => NEON_TEMPLATE_IDS.includes(t.id)).map((tmpl) => (
+                  <option key={tmpl.id} value={tmpl.id}>
+                    {tmpl.name}
+                  </option>
+                ))}
+              </optgroup>
               <optgroup label="🎞️ DIAPOSITIVAS (MULTI-ESCENA)">
                 {MOTION_TEMPLATES.filter((t) => t.id === 'two_slides_neon_flyer').map((tmpl) => (
                   <option key={tmpl.id} value={tmpl.id}>
@@ -295,7 +308,7 @@ export function App() {
                 ))}
               </optgroup>
               <optgroup label="🌊 MOVIMIENTOS SUAVES & CINE (8 Estilos)">
-                {MOTION_TEMPLATES.filter((t) => t.id !== 'two_slides_neon_flyer' && !FESTIVAL_TEMPLATE_IDS.includes(t.id)).map((tmpl) => (
+                {MOTION_TEMPLATES.filter((t) => t.id !== 'two_slides_neon_flyer' && !NEON_TEMPLATE_IDS.includes(t.id) && !FESTIVAL_TEMPLATE_IDS.includes(t.id)).map((tmpl) => (
                   <option key={tmpl.id} value={tmpl.id}>
                     {tmpl.name}
                   </option>
