@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import type { SceneProject, SceneLayer, AIProposal } from './types/scene';
-import { createEmptyProject, createMoventBrandProject, createElectronicFestivalProject } from './utils/sampleProjects';
+import { createEmptyProject, createMoventBrandProject } from './utils/sampleProjects';
 import { MOTION_TEMPLATES } from './utils/animationTemplates';
 import { parsePsdFile } from './utils/psdParser';
 import { StudioViewport } from './components/StudioViewport';
@@ -310,17 +310,9 @@ export function App() {
           <button
             className="am-tool-btn"
             onClick={() => setProject(createMoventBrandProject())}
-            title="Cargar escena Movent"
+            title="Cargar escena Demo"
           >
-            <FolderOpen size={12} /> Demo Movent
-          </button>
-
-          <button
-            className="am-tool-btn"
-            onClick={() => setProject(createElectronicFestivalProject())}
-            title="Cargar escena Festival"
-          >
-            Demo Festival
+            <FolderOpen size={12} /> Demo
           </button>
 
           <button className="am-btn-ai" onClick={() => setIsAIModalOpen(true)}>
