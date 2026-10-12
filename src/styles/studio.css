@@ -170,42 +170,48 @@ body {
 }
 
 .am-btn-primary {
-  background: linear-gradient(180deg, #2b7042 0%, #178d1b 100%);
-  border: 1px solid #23c83c;
+  background: linear-gradient(180deg, #1a3824 0%, #0e2917 100%);
+  border: 1.5px solid #23c83c;
   color: #fff;
   font-size: 11px;
   font-weight: 700;
-  padding: 5px 12px;
-  border-radius: var(--radius-sm);
+  padding: 5px 14px;
+  border-radius: 9999px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
+  box-shadow: 0 0 10px rgba(35, 200, 60, 0.25);
   transition: all 0.15s ease;
 }
 
 .am-btn-primary:hover {
+  background: linear-gradient(180deg, #224c30 0%, #143b20 100%);
+  border-color: #39ff14;
   filter: brightness(1.15);
-  box-shadow: 0 0 12px rgba(35, 200, 60, 0.3);
+  box-shadow: 0 0 16px rgba(35, 200, 60, 0.45);
 }
 
 .am-btn-ai {
-  background: linear-gradient(180deg, #1d3326 0%, #063d29 100%);
-  border: 1px solid rgba(35, 200, 60, 0.5);
+  background: linear-gradient(180deg, #162d1e 0%, #0d2214 100%);
+  border: 1.5px solid #23c83c;
   color: var(--movent-bright);
   font-size: 11px;
   font-weight: 700;
-  padding: 5px 12px;
-  border-radius: var(--radius-sm);
+  padding: 5px 14px;
+  border-radius: 9999px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
+  box-shadow: 0 0 8px rgba(35, 200, 60, 0.2);
+  transition: all 0.15s ease;
 }
 
 .am-btn-ai:hover {
-  border-color: var(--movent-bright);
-  box-shadow: 0 0 14px rgba(35, 200, 60, 0.25);
+  background: linear-gradient(180deg, #1e3a27 0%, #112d1c 100%);
+  border-color: #39ff14;
+  box-shadow: 0 0 14px rgba(35, 200, 60, 0.4);
 }
 
 /* Main Workspace (Apple Motion 3-pane split) */
@@ -1057,21 +1063,24 @@ body {
 
 /* Glowing Preview Button */
 .am-btn-preview {
-  background: linear-gradient(180deg, #2b7042 0%, #178d1b 100%) !important;
-  border: 1px solid #23c83c !important;
+  background: linear-gradient(180deg, #1f542c 0%, #133c1d 100%) !important;
+  border: 1.5px solid #28e044 !important;
   color: #fff !important;
   font-weight: 700 !important;
-  padding: 5px 14px !important;
-  border-radius: var(--radius-sm) !important;
+  padding: 5px 16px !important;
+  border-radius: 9999px !important;
   cursor: pointer !important;
   display: flex !important;
   align-items: center !important;
   gap: 6px !important;
-  box-shadow: 0 0 14px rgba(35, 200, 60, 0.35) !important;
+  box-shadow: 0 0 16px rgba(35, 200, 60, 0.35) !important;
+  transition: all 0.15s ease !important;
 }
 
 .am-btn-preview:hover {
-  filter: brightness(1.2) !important;
+  background: linear-gradient(180deg, #266b37 0%, #184c25 100%) !important;
+  border-color: #39ff14 !important;
+  filter: brightness(1.15) !important;
   box-shadow: 0 0 22px rgba(35, 200, 60, 0.6) !important;
 }
 
