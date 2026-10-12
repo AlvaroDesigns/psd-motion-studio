@@ -1064,10 +1064,10 @@ export function createMoventBrandProject(): SceneProject {
       locked: false,
       canvas: gridCanvas,
       inAnimation: {
-        type: 'fadeIn',
-        start: 0.2,
+        type: 'slideUpFade',
+        start: 0.1,
         duration: 0.8,
-        easing: 'easeOutQuad',
+        easing: 'easeOutExpo',
       },
       loopAnimation: {
         type: 'none',
