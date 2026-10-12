@@ -9,6 +9,7 @@ import { LayerInspector } from './components/LayerInspector';
 import { AIDirectorModal } from './components/AIDirectorModal';
 import { ExportModal } from './components/ExportModal';
 import './styles/studio.css';
+import logoImg from './assets/logo-white.png';
 import {
   Upload,
   Sparkles,
@@ -232,13 +233,9 @@ export function App() {
       <header className="am-topbar">
         {/* Left: Brand Logo (NO BORDER) & Segmented View Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div className="am-brand">
+          <div className="am-brand" title="Movent Motion">
             <div className="am-brand-logo">
-              <img src="/icon-green-192.png" alt="Movent" />
-            </div>
-            <div className="am-brand-title">
-              <span>Movent Motion</span>
-              <span className="am-pill-tag">PRO</span>
+              <img src={logoImg} alt="Movent" />
             </div>
           </div>
 

@@ -901,7 +901,7 @@ export function createMoventBrandProject(): SceneProject {
 
     // Draw logo-white.png if loaded
     const logoImg = new Image();
-    logoImg.src = '/icon-green-512.png';
+    logoImg.src = `${import.meta.env.BASE_URL}icon-green-512.png`;
     logoImg.onload = () => {
       ctx.drawImage(logoImg, cx - 140, cy - 140, 280, 280);
     };
