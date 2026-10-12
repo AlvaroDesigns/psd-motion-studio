@@ -324,7 +324,7 @@ export function App() {
           </button>
 
           <button className="am-btn-ai" onClick={() => setIsAIModalOpen(true)}>
-            <Sparkles size={13} /> IA Director
+            <Sparkles size={13} /> IA
           </button>
         </div>
 
