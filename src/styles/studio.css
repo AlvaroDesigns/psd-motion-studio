@@ -1,0 +1,1104 @@
+:root {
+  /* Paleta Movent */
+  --movent-background: #030907;
+  --movent-forest: #063D29;
+  --movent-green: #178D1B;
+  --movent-bright: #23C83C;
+  --movent-teal: #007B49;
+  --movent-white: #FFFFFF;
+
+  /* Apple Motion Pro UI Colors */
+  --am-bg-dark: #121316;
+  --am-bg-panel: #1a1b20;
+  --am-bg-toolbar: #22232a;
+  --am-bg-header: #1e1f26;
+  --am-border: #2c2d36;
+  --am-border-subtle: #24252d;
+  --am-text: #e2e4ea;
+  --am-text-dim: #8b8e9b;
+  --am-text-faint: #565866;
+  --am-blue: #2f6fd4;
+  --am-blue-light: #4889ed;
+  --am-track-blue: #244b7a;
+  --am-track-green: #1a5c37;
+  --am-accent: var(--movent-bright);
+
+  --radius-xs: 3px;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--am-bg-dark);
+  color: var(--am-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+  font-size: 12px;
+}
+
+/* Custom Sleek Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--am-bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: #353642;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4b5b;
+}
+
+/* App Container */
+.motion-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  background: var(--am-bg-dark);
+}
+
+/* Apple Motion Top Toolbar */
+.am-topbar {
+  height: 48px;
+  background: linear-gradient(180deg, #272831 0%, #1f2027 100%);
+  border-bottom: 1px solid var(--am-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  z-index: 100;
+  gap: 12px;
+}
+
+/* Logo without border as requested */
+.am-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 12px;
+  border-right: 1px solid var(--am-border);
+}
+
+.am-brand-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.am-brand-logo img {
+  height: 24px;
+  width: auto;
+  display: block;
+}
+
+.am-brand-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.am-pill-tag {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(35, 200, 60, 0.15);
+  color: var(--movent-bright);
+  padding: 1px 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(35, 200, 60, 0.3);
+}
+
+/* Toolbar Segmented Controls */
+.am-segmented-group {
+  display: inline-flex;
+  background: #18191f;
+  border: 1px solid var(--am-border);
+  border-radius: var(--radius-sm);
+  padding: 2px;
+  gap: 2px;
+}
+
+.am-tool-btn {
+  background: transparent;
+  border: none;
+  color: var(--am-text-dim);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+
+.am-tool-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.am-tool-btn.active {
+  background: #323440;
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.am-btn-primary {
+  background: linear-gradient(180deg, #2b7042 0%, #178D1B 100%);
+  border: 1px solid #23C83C;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s ease;
+}
+
+.am-btn-primary:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 0 12px rgba(35, 200, 60, 0.3);
+}
+
+.am-btn-ai {
+  background: linear-gradient(180deg, #1d3326 0%, #063D29 100%);
+  border: 1px solid rgba(35, 200, 60, 0.5);
+  color: var(--movent-bright);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.am-btn-ai:hover {
+  border-color: var(--movent-bright);
+  box-shadow: 0 0 14px rgba(35, 200, 60, 0.25);
+}
+
+/* Main Workspace (Apple Motion 3-pane split) */
+.am-workspace {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--am-bg-dark);
+}
+
+/* Left Pane: Layers / Media / Audio */
+.am-pane-left {
+  width: 290px;
+  background: var(--am-bg-panel);
+  border-right: 1px solid var(--am-border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.am-pane-tabs {
+  height: 32px;
+  background: var(--am-bg-header);
+  border-bottom: 1px solid var(--am-border);
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  gap: 2px;
+}
+
+.am-tab-item {
+  flex: 1;
+  height: 24px;
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--am-text-dim);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.am-tab-item.active {
+  background: #2b2c36;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Layers Hierarchy List */
+.am-layers-container {
+  flex: 1;
+  overflow-y: auto;
+  background: #15161b;
+}
+
+.am-layer-row {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  gap: 8px;
+  transition: background 0.1s ease;
+}
+
+.am-layer-row:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.am-layer-row.selected {
+  background: #223c2d !important;
+  border-left: 2px solid var(--movent-bright);
+}
+
+.am-check-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid #454756;
+  background: #22242c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.am-check-box.checked {
+  background: var(--am-blue);
+  border-color: var(--am-blue-light);
+  color: #fff;
+}
+
+.am-layer-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  background: #000;
+  border: 1px solid #333540;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.am-layer-icon canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.am-layer-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--am-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Center Canvas / Viewport Area */
+.am-pane-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #0d0e12;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.am-canvas-header {
+  height: 32px;
+  background: #181920;
+  border-bottom: 1px solid var(--am-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.am-canvas-dropdown {
+  background: #24252e;
+  border: 1px solid var(--am-border);
+  color: var(--am-text);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.am-viewport-stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 0;
+  padding: 10px;
+}
+
+.am-canvas-frame {
+  position: relative;
+  height: calc(100% - 10px);
+  aspect-ratio: 9 / 16;
+  max-width: calc((100% - 10px) * 9 / 16);
+  background: #030907;
+  border: 1px solid #23C83C;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.9), 0 0 25px rgba(35, 200, 60, 0.15);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.am-canvas-frame canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* Apple Motion Sub-Canvas Transport Bar */
+.am-transport-bar {
+  height: 40px;
+  background: #1c1d24;
+  border-top: 1px solid var(--am-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 20;
+}
+
+.am-tools-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.am-transport-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.am-timecode-box {
+  background: #0a0b0e;
+  border: 1px solid #282a35;
+  border-radius: var(--radius-xs);
+  padding: 2px 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--movent-bright);
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Right Pane: Inspector */
+.am-pane-right {
+  width: 310px;
+  background: var(--am-bg-panel);
+  border-left: 1px solid var(--am-border);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Bottom Pane: Apple Motion Timeline */
+.am-timeline-container {
+  height: 250px;
+  background: #131418;
+  border-top: 1px solid var(--am-border);
+  display: flex;
+  flex-direction: column;
+  z-index: 50;
+}
+
+.am-timeline-header {
+  height: 32px;
+  background: #1a1b22;
+  border-bottom: 1px solid var(--am-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+
+.am-timeline-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.am-timeline-left-headers {
+  width: 220px;
+  background: #17181f;
+  border-right: 1px solid var(--am-border);
+  overflow-y: hidden;
+}
+
+.am-timeline-tracks-scroll {
+  flex: 1;
+  background: #0e0f13;
+  overflow-x: auto;
+  overflow-y: hidden;
+  position: relative;
+}
+
+.am-timeline-ruler {
+  height: 26px;
+  background: #181920;
+  border-bottom: 1px solid var(--am-border);
+  position: relative;
+  cursor: pointer;
+}
+
+.am-ruler-tick {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  padding-left: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  color: var(--am-text-faint);
+  border-left: 1px solid #282a35;
+}
+
+.am-playhead-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: #ff3b30;
+  box-shadow: 0 0 8px rgba(255, 59, 48, 0.8);
+  z-index: 50;
+  pointer-events: none;
+}
+
+.am-playhead-needle {
+  position: absolute;
+  top: 0;
+  left: -6px;
+  width: 14px;
+  height: 16px;
+  background: #ff3b30;
+  clip-path: polygon(0% 0%, 100% 0%, 100% 60%, 50% 100%, 0% 60%);
+  cursor: ew-resize;
+  pointer-events: auto;
+}
+
+.am-track-row {
+  height: 30px;
+  border-bottom: 1px solid #1a1b22;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Apple Motion Track Blocks */
+.am-track-clip {
+  position: absolute;
+  height: 22px;
+  border-radius: var(--radius-xs);
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: #fff;
+  cursor: grab;
+  user-select: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.am-clip-in {
+  background: linear-gradient(90deg, #178D1B, #23C83C);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.am-clip-loop {
+  background: linear-gradient(90deg, #063D29, #007B49);
+  border: 1px solid rgba(35, 200, 60, 0.4);
+}
+
+.am-clip-out {
+  background: linear-gradient(90deg, #8a1f2d, #bf263c);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+/* Timeline Bottom Footer */
+.am-timeline-footer {
+  height: 24px;
+  background: #181920;
+  border-top: 1px solid var(--am-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-size: 10px;
+  color: var(--am-text-dim);
+}
+
+/* =========================================
+   APPLE MOTION PRO INSPECTOR STYLES
+   ========================================= */
+
+.am-inspector {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: #181920;
+  color: #e2e4ea;
+  overflow-y: auto;
+  font-size: 11px;
+}
+
+.am-inspector-header {
+  height: 36px;
+  background: #1e1f26;
+  border-bottom: 1px solid var(--am-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--am-text-dim);
+  font-size: 10px;
+}
+
+.am-role-badge {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: rgba(35, 200, 60, 0.15);
+  color: var(--movent-bright);
+  border: 1px solid rgba(35, 200, 60, 0.35);
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+/* Inspector Top Tabs: [ Properties | Behaviors | Filters ] */
+.am-inspector-tabs {
+  display: flex;
+  background: #14151a;
+  border-bottom: 1px solid var(--am-border);
+  padding: 4px;
+  gap: 3px;
+}
+
+.am-insp-tab {
+  flex: 1;
+  height: 24px;
+  background: transparent;
+  border: none;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--am-text-dim);
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all 0.15s ease;
+}
+
+.am-insp-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.am-insp-tab.active {
+  background: #2b2c36;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* Inspector Section Cards */
+.am-section-card {
+  border-bottom: 1px solid var(--am-border);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.am-section-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--am-text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+/* Property Rows */
+.am-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.am-field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--am-text-dim);
+}
+
+.am-field-value-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  background: #0f1014;
+  border: 1px solid #282a35;
+  color: var(--movent-bright);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+/* Apple Motion Dark Inputs */
+.am-input {
+  width: 100%;
+  background: #111216 !important;
+  border: 1px solid #282a35 !important;
+  color: #fff !important;
+  font-size: 11.5px;
+  padding: 6px 9px;
+  border-radius: var(--radius-xs);
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.am-input:focus {
+  border-color: var(--movent-bright) !important;
+  box-shadow: 0 0 0 1px var(--movent-bright);
+}
+
+/* Apple Motion Styled Select */
+.am-select {
+  width: 100%;
+  background: #14151b url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238b8e9b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E") no-repeat right 8px center !important;
+  border: 1px solid #282a35 !important;
+  color: #fff !important;
+  font-size: 11.5px;
+  padding: 6px 24px 6px 9px;
+  border-radius: var(--radius-xs);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.am-select:focus {
+  border-color: var(--movent-bright) !important;
+}
+
+.am-select option {
+  background: #1a1b22;
+  color: #fff;
+}
+
+/* Apple Motion Slider */
+.am-slider {
+  width: 100%;
+  height: 4px;
+  background: #252733;
+  border-radius: 2px;
+  outline: none;
+  appearance: none;
+  accent-color: var(--movent-bright);
+  cursor: pointer;
+  margin: 4px 0;
+}
+
+.am-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--movent-bright);
+  cursor: pointer;
+  box-shadow: 0 0 6px rgba(35, 200, 60, 0.6);
+}
+
+/* Apple Motion Toggle Row */
+.am-effect-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  background: #14151b;
+  border: 1px solid #24252e;
+  border-radius: var(--radius-xs);
+  transition: all 0.15s ease;
+}
+
+.am-effect-row.active {
+  border-color: rgba(35, 200, 60, 0.35);
+  background: rgba(6, 61, 41, 0.2);
+}
+
+/* macOS / iOS Switch */
+.am-switch {
+  position: relative;
+  display: inline-block;
+  width: 28px;
+  height: 16px;
+}
+
+.am-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.am-switch-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #333542;
+  border-radius: 16px;
+  transition: 0.2s;
+}
+
+.am-switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 12px;
+  width: 12px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  border-radius: 50%;
+  transition: 0.2s;
+}
+
+.am-switch input:checked + .am-switch-slider {
+  background-color: var(--movent-bright);
+}
+
+.am-switch input:checked + .am-switch-slider:before {
+  transform: translateX(12px);
+  background-color: #030907;
+}
+
+/* =========================================
+   PRO MODAL STYLES (Export & AI Director)
+   ========================================= */
+
+.modal-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(0, 0, 0, 0.82) !important;
+  backdrop-filter: blur(16px) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 1000 !important;
+  animation: amFadeIn 0.15s ease-out;
+}
+
+.modal-content {
+  background: #181922 !important;
+  border: 1px solid #333544 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(35, 200, 60, 0.18) !important;
+  width: 90% !important;
+  max-width: 680px !important;
+  max-height: 85vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  color: #e2e4ea !important;
+}
+
+.modal-header {
+  padding: 14px 20px !important;
+  background: #20222d !important;
+  border-bottom: 1px solid #2e303d !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.modal-title {
+  font-family: -apple-system, BlinkMacSystemFont, 'Outfit', sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  color: #fff !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.modal-body {
+  padding: 20px !important;
+  overflow-y: auto !important;
+  flex: 1 !important;
+  background: #15161d !important;
+}
+
+.btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  font-family: inherit !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  padding: 7px 14px !important;
+  border-radius: var(--radius-sm) !important;
+  border: 1px solid #333544 !important;
+  background: #22242f !important;
+  color: #e2e4ea !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.btn:hover {
+  background: #2c2f3d !important;
+  border-color: #44475a !important;
+  color: #fff !important;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #2b7042 0%, #178D1B 100%) !important;
+  border: 1px solid #23C83C !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 0 16px rgba(35, 200, 60, 0.3) !important;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.15) !important;
+  box-shadow: 0 0 24px rgba(35, 200, 60, 0.5) !important;
+}
+
+.btn-ai {
+  background: linear-gradient(180deg, #1d3326 0%, #063D29 100%) !important;
+  border: 1px solid rgba(35, 200, 60, 0.5) !important;
+  color: var(--movent-bright) !important;
+}
+
+.icon-btn {
+  background: transparent !important;
+  border: none !important;
+  color: var(--am-text-dim) !important;
+  width: 26px !important;
+  height: 26px !important;
+  border-radius: 4px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+}
+
+.icon-btn:hover {
+  color: #fff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.proposal-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.proposal-card {
+  background: #1c1d27;
+  border: 1px solid #2e303d;
+  border-radius: var(--radius-sm);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.proposal-card:hover {
+  border-color: #44475a;
+  background: #222430;
+}
+
+.proposal-card.selected {
+  border-color: var(--movent-bright);
+  background: #1c2b22;
+  box-shadow: 0 0 16px rgba(35, 200, 60, 0.2);
+}
+
+/* =========================================
+   KEYFRAMES GRAPH TIMELINE STYLES
+   ========================================= */
+
+.am-keyframe-node {
+  position: absolute;
+  width: 11px;
+  height: 11px;
+  transform: translate(-5.5px, -5.5px) rotate(45deg);
+  background: var(--movent-bright);
+  border: 1px solid #fff;
+  border-radius: 1px;
+  cursor: pointer;
+  z-index: 25;
+  box-shadow: 0 0 8px rgba(35, 200, 60, 0.9);
+  transition: transform 0.1s ease;
+}
+
+.am-keyframe-node:hover {
+  transform: translate(-5.5px, -5.5px) rotate(45deg) scale(1.4);
+  background: #fff;
+}
+
+.am-keyframe-line {
+  position: absolute;
+  height: 2px;
+  background: rgba(35, 200, 60, 0.4);
+  top: 14px;
+  pointer-events: none;
+}
+
+/* Glowing Preview Button */
+.am-btn-preview {
+  background: linear-gradient(180deg, #2b7042 0%, #178D1B 100%) !important;
+  border: 1px solid #23C83C !important;
+  color: #fff !important;
+  font-weight: 700 !important;
+  padding: 5px 14px !important;
+  border-radius: var(--radius-sm) !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  box-shadow: 0 0 14px rgba(35, 200, 60, 0.35) !important;
+}
+
+.am-btn-preview:hover {
+  filter: brightness(1.2) !important;
+  box-shadow: 0 0 22px rgba(35, 200, 60, 0.6) !important;
+}
+
+@keyframes amFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+
+/* Storyboard / Diapositivas Strip */
+.am-slides-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  background: #0d1612;
+  border-bottom: 1px solid #1a2e22;
+  font-size: 11px;
+  overflow-x: auto;
+}
+
+.am-slide-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #16201a;
+  border: 1px solid #23382c;
+  color: #ddd;
+  padding: 3px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.am-slide-pill:hover {
+  background: #1e3325;
+  border-color: var(--movent-bright);
+  color: #fff;
+}
+
+.am-slide-pill.active {
+  background: #174227;
+  border-color: var(--movent-bright);
+  color: #fff;
+  box-shadow: 0 0 10px rgba(35, 200, 60, 0.25);
+}
+
+.am-slide-time-badge {
+  font-size: 9px;
+  background: rgba(0, 0, 0, 0.45);
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--movent-bright);
+  font-family: monospace;
+}
+
+.am-slide-transition-badge {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 9px;
+  color: #ffd166;
+  background: rgba(255, 209, 102, 0.12);
+  border: 1px solid rgba(255, 209, 102, 0.25);
+  padding: 2px 6px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
