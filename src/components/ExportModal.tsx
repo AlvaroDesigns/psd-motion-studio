@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { SceneProject } from '../types/scene';
 import { computeLayerState, renderLayerToCanvas } from '../engine/motionEngine';
 import { Download, Film, Code, Check, Loader2, X, Play } from 'lucide-react';
+import { Muxer, ArrayBufferTarget } from 'mp4-muxer';
 
 interface ExportModalProps {
   isOpen: boolean;
@@ -65,76 +66,144 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
     downloadAnchor.remove();
   };
 
-  // High-fidelity client-side render to Video
+  // High-fidelity client-side render to MP4
   const handleRenderVideo = async () => {
     setIsExporting(true);
     setProgress(0);
     setVideoUrl(null);
 
+    const width = project.settings.width;
+    const height = project.settings.height;
+    const fps = project.settings.fps;
+    const totalFrames = Math.ceil(project.settings.duration * fps);
+
     // Offscreen render canvas
     const offscreen = document.createElement('canvas');
-    offscreen.width = project.settings.width;
-    offscreen.height = project.settings.height;
+    offscreen.width = width;
+    offscreen.height = height;
     const ctx = offscreen.getContext('2d');
     if (!ctx) {
       setIsExporting(false);
       return;
     }
 
-    const stream = offscreen.captureStream(project.settings.fps);
-    const mimeTypes = [
-      'video/mp4;codecs=avc1',
-      'video/webm;codecs=vp9',
-      'video/webm;codecs=vp8',
-      'video/webm',
-    ];
-    let selectedMime = mimeTypes.find((m) => MediaRecorder.isTypeSupported(m)) || 'video/webm';
+    try {
+      // 1. Try modern WebCodecs + mp4-muxer (Native H.264 MP4)
+      if (typeof window !== 'undefined' && typeof window.VideoEncoder !== 'undefined') {
+        const muxer = new Muxer({
+          target: new ArrayBufferTarget(),
+          video: {
+            codec: 'avc',
+            width,
+            height,
+          },
+          fastStart: 'in-memory',
+        });
 
-    const recorder = new MediaRecorder(stream, {
-      mimeType: selectedMime,
-      videoBitsPerSecond: 12000000, // 12 Mbps crystal clear
-    });
+        const videoEncoder = new VideoEncoder({
+          output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+          error: (e) => console.error('VideoEncoder error:', e),
+        });
 
-    const chunks: Blob[] = [];
-    recorder.ondataavailable = (e) => {
-      if (e.data.size > 0) chunks.push(e.data);
-    };
+        videoEncoder.configure({
+          codec: 'avc1.4d002a', // H.264 Main Profile Level 4.2
+          width,
+          height,
+          bitrate: 14_000_000, // 14 Mbps high bitrate
+          framerate: fps,
+        });
 
-    recorder.onstop = () => {
-      const blob = new Blob(chunks, { type: selectedMime });
-      const url = URL.createObjectURL(blob);
-      setVideoUrl(url);
-      setIsExporting(false);
-      setProgress(100);
-    };
+        for (let frame = 0; frame <= totalFrames; frame++) {
+          const t = frame / fps;
 
-    recorder.start();
+          // Clear & render frame
+          ctx.fillStyle = project.settings.backgroundColor;
+          ctx.fillRect(0, 0, width, height);
 
-    const fps = project.settings.fps;
-    const totalFrames = Math.ceil(project.settings.duration * fps);
-    const frameInterval = 1000 / fps;
+          for (const layer of project.layers) {
+            if (!layer.visible) continue;
+            const state = computeLayerState(layer, t, project.settings.duration);
+            renderLayerToCanvas(ctx, layer, state);
+          }
 
-    // Render frame-by-frame
-    for (let frame = 0; frame <= totalFrames; frame++) {
-      const t = frame / fps;
+          const timestampUs = Math.round((frame / fps) * 1_000_000);
+          const videoFrame = new VideoFrame(offscreen, { timestamp: timestampUs });
+          videoEncoder.encode(videoFrame, { keyFrame: frame % (fps * 2) === 0 });
+          videoFrame.close();
 
-      // Draw background
-      ctx.fillStyle = project.settings.backgroundColor;
-      ctx.fillRect(0, 0, offscreen.width, offscreen.height);
+          setProgress(Math.round((frame / totalFrames) * 98));
 
-      // Draw each layer
-      for (const layer of project.layers) {
-        if (!layer.visible) continue;
-        const state = computeLayerState(layer, t, project.settings.duration);
-        renderLayerToCanvas(ctx, layer, state);
+          // Allow browser UI render cycles
+          if (frame % 4 === 0) {
+            await new Promise((resolve) => setTimeout(resolve, 0));
+          }
+        }
+
+        await videoEncoder.flush();
+        muxer.finalize();
+
+        const buffer = muxer.target.buffer;
+        const blob = new Blob([buffer], { type: 'video/mp4' });
+        const url = URL.createObjectURL(blob);
+        setVideoUrl(url);
+        setIsExporting(false);
+        setProgress(100);
+        return;
       }
 
-      setProgress(Math.round((frame / totalFrames) * 100));
-      // Give MediaRecorder time to capture each frame
-      await new Promise((resolve) => setTimeout(resolve, Math.max(10, frameInterval * 0.4)));
-    }
+      // 2. Fallback to MediaRecorder (preferring MP4)
+      const stream = offscreen.captureStream(fps);
+      const mimeTypes = [
+        'video/mp4;codecs=avc1',
+        'video/mp4',
+        'video/webm;codecs=vp9',
+        'video/webm;codecs=vp8',
+        'video/webm',
+      ];
+      const selectedMime = mimeTypes.find((m) => MediaRecorder.isTypeSupported(m)) || 'video/mp4';
 
-    recorder.stop();
+      const recorder = new MediaRecorder(stream, {
+        mimeType: selectedMime,
+        videoBitsPerSecond: 14000000,
+      });
+
+      const chunks: Blob[] = [];
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: selectedMime.includes('mp4') ? 'video/mp4' : selectedMime });
+        const url = URL.createObjectURL(blob);
+        setVideoUrl(url);
+        setIsExporting(false);
+        setProgress(100);
+      };
+
+      recorder.start();
+
+      const frameInterval = 1000 / fps;
+      for (let frame = 0; frame <= totalFrames; frame++) {
+        const t = frame / fps;
+
+        ctx.fillStyle = project.settings.backgroundColor;
+        ctx.fillRect(0, 0, width, height);
+
+        for (const layer of project.layers) {
+          if (!layer.visible) continue;
+          const state = computeLayerState(layer, t, project.settings.duration);
+          renderLayerToCanvas(ctx, layer, state);
+        }
+
+        setProgress(Math.round((frame / totalFrames) * 100));
+        await new Promise((resolve) => setTimeout(resolve, Math.max(10, frameInterval * 0.4)));
+      }
+
+      recorder.stop();
+    } catch (err) {
+      console.error('Error rendering video:', err);
+      setIsExporting(false);
+    }
   };
 
   return (
@@ -143,7 +212,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
         {/* Header */}
         <div className="modal-header">
           <div className="modal-title">
-            <span style={{ color: 'var(--neon-cyan)', display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ color: '#60a5fa', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Film size={22} />
             </span>
             <span>Exportar Proyecto</span>
@@ -156,24 +225,24 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
         {/* Body */}
         <div className="modal-body">
           {/* Tabs */}
-          <div style={{ display: 'flex', gap: 10, borderBottom: '1px solid var(--border-subtle)', paddingBottom: 10, marginBottom: 16 }}>
+          <div style={{ display: 'flex', gap: 10, borderBottom: '1px solid var(--am-border)', paddingBottom: 10, marginBottom: 16 }}>
             <button
               className="btn"
               style={{
-                background: activeTab === 'video' ? 'rgba(0, 240, 255, 0.15)' : 'transparent',
-                borderColor: activeTab === 'video' ? 'var(--neon-cyan)' : 'transparent',
-                color: activeTab === 'video' ? 'var(--neon-cyan)' : 'var(--text-muted)',
+                background: activeTab === 'video' ? 'rgba(59, 130, 246, 0.15)' : 'transparent',
+                borderColor: activeTab === 'video' ? '#3b82f6' : 'transparent',
+                color: activeTab === 'video' ? '#93c5fd' : 'var(--am-text-dim)',
               }}
               onClick={() => setActiveTab('video')}
             >
-              <Film size={14} /> Renderizar Vídeo (1080×1920)
+              <Film size={14} /> Renderizar Vídeo MP4 (1080×1920)
             </button>
             <button
               className="btn"
               style={{
-                background: activeTab === 'json' ? 'rgba(247, 37, 133, 0.15)' : 'transparent',
-                borderColor: activeTab === 'json' ? 'var(--neon-magenta)' : 'transparent',
-                color: activeTab === 'json' ? 'var(--neon-magenta)' : 'var(--text-muted)',
+                background: activeTab === 'json' ? 'rgba(168, 85, 247, 0.15)' : 'transparent',
+                borderColor: activeTab === 'json' ? '#a855f7' : 'transparent',
+                color: activeTab === 'json' ? '#d8b4fe' : 'var(--am-text-dim)',
               }}
               onClick={() => setActiveTab('json')}
             >
@@ -183,59 +252,62 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
 
           {activeTab === 'video' ? (
             <div>
-              <p style={{ fontSize: 13, color: 'var(--text-muted)', marginBottom: 16 }}>
-                Exporta la animación determinista completa a <strong>1080×1920 (9:16) a {project.settings.fps} FPS</strong> con todos los efectos (Glow, Light Sweep, RGB Split, Glitch).
+              <p style={{ fontSize: 13, color: 'var(--am-text-dim)', marginBottom: 16 }}>
+                Exporta la animación determinista completa a <strong>MP4 (H.264) a 1080×1920 (9:16) a {project.settings.fps} FPS</strong> con todos los efectos (Glow, Light Sweep, RGB Split, Glitch) listo para Stories, Reels y QuickTime.
               </p>
 
               {isExporting ? (
-                <div style={{ textAlign: 'center', padding: '30px 20px', background: 'rgba(0,0,0,0.3)', borderRadius: 'var(--radius-md)' }}>
-                  <Loader2 size={32} className="spin" color="var(--neon-cyan)" style={{ animation: 'spin 1s linear infinite', marginBottom: 12 }} />
-                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Renderizando fotogramas... {progress}%</div>
+                <div style={{ textAlign: 'center', padding: '30px 20px', background: '#111218', borderRadius: 8, border: '1px solid var(--am-border)' }}>
+                  <Loader2 size={32} className="spin" color="#3b82f6" style={{ animation: 'spin 1s linear infinite', marginBottom: 12 }} />
+                  <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 6 }}>Renderizando vídeo MP4... {progress}%</div>
                   <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden' }}>
-                    <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, var(--neon-cyan), var(--neon-magenta))', transition: 'width 0.1s linear' }} />
+                    <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #6366f1)', transition: 'width 0.1s linear' }} />
                   </div>
                 </div>
               ) : videoUrl ? (
-                <div style={{ textAlign: 'center', padding: 16, background: 'rgba(0,0,0,0.3)', borderRadius: 'var(--radius-md)' }}>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--neon-green)', marginBottom: 12 }}>
-                    ✓ ¡Vídeo renderizado con éxito!
+                <div style={{ textAlign: 'center', padding: 16, background: '#111218', borderRadius: 8, border: '1px solid var(--am-border)' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#4ade80', marginBottom: 12 }}>
+                    ✓ ¡Vídeo MP4 renderizado con éxito!
                   </div>
                   <video
                     src={videoUrl}
                     controls
                     autoPlay
                     loop
-                    style={{ width: 180, borderRadius: 8, border: '1px solid var(--border-accent)', boxShadow: '0 0 20px rgba(0,240,255,0.2)', marginBottom: 16 }}
+                    style={{ width: 180, borderRadius: 8, border: '1px solid #384058', boxShadow: '0 0 20px rgba(59, 130, 246, 0.2)', marginBottom: 16 }}
                   />
-                  <div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                     <a
                       href={videoUrl}
-                      download={`${project.settings.name.toLowerCase().replace(/\s+/g, '_')}_1080x1920.webm`}
+                      download={`${project.settings.name.toLowerCase().replace(/\s+/g, '_')}_1080x1920.mp4`}
                       className="btn btn-primary"
-                      style={{ padding: '8px 20px', textDecoration: 'none' }}
+                      style={{ padding: '9px 24px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, fontWeight: 700 }}
                     >
-                      <Download size={16} /> Descargar Archivo de Vídeo
+                      <Download size={16} /> Descargar Archivo MP4
                     </a>
+                    <span style={{ fontSize: 11, color: 'var(--am-text-dim)' }}>
+                      Formato: <strong>MP4 (H.264)</strong> • 1080×1920 (9:16) • {project.settings.fps} FPS
+                    </span>
                   </div>
                 </div>
               ) : (
                 <div style={{ textAlign: 'center', padding: '24px 0' }}>
                   <button className="btn btn-primary" style={{ padding: '10px 24px', fontSize: 14 }} onClick={handleRenderVideo}>
-                    <Play size={16} /> Iniciar Renderizado Ahora
+                    <Play size={16} /> Iniciar Renderizado MP4
                   </button>
                 </div>
               )}
             </div>
           ) : (
             <div>
-              <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12 }}>
+              <p style={{ fontSize: 12, color: 'var(--am-text-dim)', marginBottom: 12 }}>
                 Este esquema JSON determinista es consumible por el worker de backend <strong>FFmpeg</strong> o la API de renderizado remoto.
               </p>
               <div style={{ position: 'relative' }}>
                 <pre
                   style={{
                     background: '#090a10',
-                    border: '1px solid var(--border-subtle)',
+                    border: '1px solid var(--am-border)',
                     padding: 14,
                     borderRadius: 6,
                     maxHeight: 280,
@@ -250,7 +322,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
               </div>
               <div style={{ display: 'flex', gap: 10, marginTop: 14 }}>
                 <button className="btn" onClick={handleCopyJson}>
-                  {jsonCopied ? <Check size={14} color="var(--neon-green)" /> : <Code size={14} />}
+                  {jsonCopied ? <Check size={14} color="#4ade80" /> : <Code size={14} />}
                   {jsonCopied ? '¡Copiado!' : 'Copiar JSON'}
                 </button>
                 <button className="btn" onClick={handleDownloadJson}>
