@@ -1,15 +1,15 @@
-import React, { useRef, useState, useEffect } from 'react';
-import type { SceneProject, SceneLayer } from '../types/scene';
 import {
   Check,
-  Lock,
-  Unlock,
-  Magnet,
-  Scissors,
-  Plus,
   Film,
+  Lock,
+  Magnet,
+  Plus,
+  Scissors,
+  Unlock,
   Zap,
-} from 'lucide-react';
+} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import type { SceneLayer, SceneProject } from "../types/scene";
 
 interface TimelineProps {
   project: SceneProject;
@@ -31,12 +31,16 @@ export const Timeline: React.FC<TimelineProps> = ({
   onUpdateLayer,
 }) => {
   const tracksContainerRef = useRef<HTMLDivElement | null>(null);
+  const leftHeadersRef = useRef<HTMLDivElement | null>(null);
+  const isSyncingScrollRef = useRef(false);
   const [isScrubbing, setIsScrubbing] = useState(false);
   const [zoomLevel, setZoomLevel] = useState<number>(140);
-  const [timelineView, setTimelineView] = useState<'tracks' | 'keyframes'>('tracks');
+  const [timelineView, setTimelineView] = useState<"tracks" | "keyframes">(
+    "tracks",
+  );
   const [draggingClip, setDraggingClip] = useState<{
     layerId: string;
-    clipType: 'in' | 'out';
+    clipType: "in" | "out";
     startX: number;
     initialStart: number;
     initialDuration: number;
@@ -45,17 +49,32 @@ export const Timeline: React.FC<TimelineProps> = ({
 
   const [draggingKeyframe, setDraggingKeyframe] = useState<{
     layerId: string;
-    keyType: 'inStart' | 'inEnd' | 'outStart' | 'outEnd';
+    keyType: "inStart" | "inEnd" | "outStart" | "outEnd";
     startX: number;
     initialTime: number;
   } | null>(null);
 
   const pxPerSec = zoomLevel;
 
-  const slides = project.slides && project.slides.length > 0 ? project.slides : [
-    { id: 'slide-1', title: 'Intro Logo Neón', startTime: 0, duration: 2.5, transition: 'neonFlash' as const },
-    { id: 'slide-2', title: 'Flyer Principal', startTime: 2.5, duration: 4.5, transition: 'fade' as const },
-  ];
+  const slides =
+    project.slides && project.slides.length > 0
+      ? project.slides
+      : [
+          {
+            id: "slide-1",
+            title: "Intro Logo Neón",
+            startTime: 0,
+            duration: 2.5,
+            transition: "neonFlash" as const,
+          },
+          {
+            id: "slide-2",
+            title: "Flyer Principal",
+            startTime: 2.5,
+            duration: 4.5,
+            transition: "fade" as const,
+          },
+        ];
 
   const handleRulerMouseDown = (e: React.MouseEvent) => {
     setIsScrubbing(true);
@@ -65,9 +84,32 @@ export const Timeline: React.FC<TimelineProps> = ({
   const updateScrubTime = (clientX: number) => {
     if (!tracksContainerRef.current) return;
     const rect = tracksContainerRef.current.getBoundingClientRect();
-    const offsetX = Math.max(0, Math.min(rect.width, clientX - rect.left));
+    const scrollLeft = tracksContainerRef.current.scrollLeft || 0;
+    const offsetX = Math.max(0, clientX - rect.left + scrollLeft);
     const newTime = Math.max(0, Math.min(duration, offsetX / pxPerSec));
     onSeek(newTime);
+  };
+
+  const handleTracksScroll = () => {
+    if (isSyncingScrollRef.current) return;
+    isSyncingScrollRef.current = true;
+    if (leftHeadersRef.current && tracksContainerRef.current) {
+      leftHeadersRef.current.scrollTop = tracksContainerRef.current.scrollTop;
+    }
+    requestAnimationFrame(() => {
+      isSyncingScrollRef.current = false;
+    });
+  };
+
+  const handleLeftHeadersScroll = () => {
+    if (isSyncingScrollRef.current) return;
+    isSyncingScrollRef.current = true;
+    if (leftHeadersRef.current && tracksContainerRef.current) {
+      tracksContainerRef.current.scrollTop = leftHeadersRef.current.scrollTop;
+    }
+    requestAnimationFrame(() => {
+      isSyncingScrollRef.current = false;
+    });
   };
 
   useEffect(() => {
@@ -80,63 +122,104 @@ export const Timeline: React.FC<TimelineProps> = ({
         const layer = project.layers.find((l) => l.id === draggingClip.layerId);
         if (!layer) return;
 
-        if (draggingClip.clipType === 'in') {
+        if (draggingClip.clipType === "in") {
           if (draggingClip.isResizing) {
-            const newDuration = Math.max(0.2, Math.min(3.0, draggingClip.initialDuration + deltaTime));
+            const newDuration = Math.max(
+              0.2,
+              Math.min(3.0, draggingClip.initialDuration + deltaTime),
+            );
             onUpdateLayer({
               ...layer,
-              inAnimation: { ...layer.inAnimation, duration: Number(newDuration.toFixed(2)) },
+              inAnimation: {
+                ...layer.inAnimation,
+                duration: Number(newDuration.toFixed(2)),
+              },
             });
           } else {
-            const newStart = Math.max(0, Math.min(duration - 0.5, draggingClip.initialStart + deltaTime));
+            const newStart = Math.max(
+              0,
+              Math.min(duration - 0.5, draggingClip.initialStart + deltaTime),
+            );
             onUpdateLayer({
               ...layer,
-              inAnimation: { ...layer.inAnimation, start: Number(newStart.toFixed(2)) },
+              inAnimation: {
+                ...layer.inAnimation,
+                start: Number(newStart.toFixed(2)),
+              },
             });
           }
-        } else if (draggingClip.clipType === 'out') {
+        } else if (draggingClip.clipType === "out") {
           if (draggingClip.isResizing) {
-            const newDuration = Math.max(0.2, Math.min(2.5, draggingClip.initialDuration + deltaTime));
+            const newDuration = Math.max(
+              0.2,
+              Math.min(2.5, draggingClip.initialDuration + deltaTime),
+            );
             onUpdateLayer({
               ...layer,
-              outAnimation: { ...layer.outAnimation, duration: Number(newDuration.toFixed(2)) },
+              outAnimation: {
+                ...layer.outAnimation,
+                duration: Number(newDuration.toFixed(2)),
+              },
             });
           } else {
-            const newStart = Math.max(1.0, Math.min(duration - 0.2, draggingClip.initialStart + deltaTime));
+            const newStart = Math.max(
+              1.0,
+              Math.min(duration - 0.2, draggingClip.initialStart + deltaTime),
+            );
             onUpdateLayer({
               ...layer,
-              outAnimation: { ...layer.outAnimation, start: Number(newStart.toFixed(2)) },
+              outAnimation: {
+                ...layer.outAnimation,
+                start: Number(newStart.toFixed(2)),
+              },
             });
           }
         }
       } else if (draggingKeyframe) {
         const deltaX = e.clientX - draggingKeyframe.startX;
         const deltaTime = deltaX / pxPerSec;
-        const layer = project.layers.find((l) => l.id === draggingKeyframe.layerId);
+        const layer = project.layers.find(
+          (l) => l.id === draggingKeyframe.layerId,
+        );
         if (!layer) return;
 
-        const newTime = Math.max(0, Math.min(duration, draggingKeyframe.initialTime + deltaTime));
-        if (draggingKeyframe.keyType === 'inStart') {
+        const newTime = Math.max(
+          0,
+          Math.min(duration, draggingKeyframe.initialTime + deltaTime),
+        );
+        if (draggingKeyframe.keyType === "inStart") {
           onUpdateLayer({
             ...layer,
-            inAnimation: { ...layer.inAnimation, start: Number(newTime.toFixed(2)) },
+            inAnimation: {
+              ...layer.inAnimation,
+              start: Number(newTime.toFixed(2)),
+            },
           });
-        } else if (draggingKeyframe.keyType === 'inEnd') {
+        } else if (draggingKeyframe.keyType === "inEnd") {
           const newDur = Math.max(0.2, newTime - layer.inAnimation.start);
           onUpdateLayer({
             ...layer,
-            inAnimation: { ...layer.inAnimation, duration: Number(newDur.toFixed(2)) },
+            inAnimation: {
+              ...layer.inAnimation,
+              duration: Number(newDur.toFixed(2)),
+            },
           });
-        } else if (draggingKeyframe.keyType === 'outStart') {
+        } else if (draggingKeyframe.keyType === "outStart") {
           onUpdateLayer({
             ...layer,
-            outAnimation: { ...layer.outAnimation, start: Number(newTime.toFixed(2)) },
+            outAnimation: {
+              ...layer.outAnimation,
+              start: Number(newTime.toFixed(2)),
+            },
           });
-        } else if (draggingKeyframe.keyType === 'outEnd') {
+        } else if (draggingKeyframe.keyType === "outEnd") {
           const newDur = Math.max(0.2, newTime - layer.outAnimation.start);
           onUpdateLayer({
             ...layer,
-            outAnimation: { ...layer.outAnimation, duration: Number(newDur.toFixed(2)) },
+            outAnimation: {
+              ...layer.outAnimation,
+              duration: Number(newDur.toFixed(2)),
+            },
           });
         }
       }
@@ -149,15 +232,22 @@ export const Timeline: React.FC<TimelineProps> = ({
     };
 
     if (isScrubbing || draggingClip || draggingKeyframe) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
     }
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
     };
-  }, [isScrubbing, draggingClip, draggingKeyframe, pxPerSec, duration, project.layers]);
+  }, [
+    isScrubbing,
+    draggingClip,
+    draggingKeyframe,
+    pxPerSec,
+    duration,
+    project.layers,
+  ]);
 
   // Frame ticks (Apple Motion ruler: 1, 30, 60, 90, 120...)
   const fps = project.settings.fps;
@@ -178,12 +268,18 @@ export const Timeline: React.FC<TimelineProps> = ({
     if (currentTime < duration / 2) {
       onUpdateLayer({
         ...layer,
-        inAnimation: { ...layer.inAnimation, start: Number(currentTime.toFixed(2)) },
+        inAnimation: {
+          ...layer.inAnimation,
+          start: Number(currentTime.toFixed(2)),
+        },
       });
     } else {
       onUpdateLayer({
         ...layer,
-        outAnimation: { ...layer.outAnimation, start: Number(currentTime.toFixed(2)) },
+        outAnimation: {
+          ...layer.outAnimation,
+          start: Number(currentTime.toFixed(2)),
+        },
       });
     }
   };
@@ -192,31 +288,39 @@ export const Timeline: React.FC<TimelineProps> = ({
     <div className="am-timeline-container">
       {/* TIMELINE TOOLBAR (Functional Tracks vs Keyframes switcher) */}
       <div className="am-timeline-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 11, fontWeight: 700, color: '#fff' }}>Timeline</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#fff" }}>
+            Timeline
+          </span>
 
           {/* Functional Mode Switcher */}
           <div className="am-segmented-group" style={{ height: 22 }}>
             <button
-              className={`am-tool-btn ${timelineView === 'tracks' ? 'active' : ''}`}
-              style={{ padding: '2px 9px', fontSize: 10 }}
-              onClick={() => setTimelineView('tracks')}
+              className={`am-tool-btn ${timelineView === "tracks" ? "active" : ""}`}
+              style={{ padding: "2px 9px", fontSize: 10 }}
+              onClick={() => setTimelineView("tracks")}
             >
               Tracks
             </button>
             <button
-              className={`am-tool-btn ${timelineView === 'keyframes' ? 'active' : ''}`}
-              style={{ padding: '2px 9px', fontSize: 10 }}
-              onClick={() => setTimelineView('keyframes')}
+              className={`am-tool-btn ${timelineView === "keyframes" ? "active" : ""}`}
+              style={{ padding: "2px 9px", fontSize: 10 }}
+              onClick={() => setTimelineView("keyframes")}
             >
               Keyframes (Curvas)
             </button>
           </div>
 
-          {timelineView === 'keyframes' && (
+          {timelineView === "keyframes" && (
             <button
               className="am-tool-btn"
-              style={{ background: '#1e293b', border: '1px solid #3b82f6', color: '#93c5fd', fontSize: 10, padding: '2px 8px' }}
+              style={{
+                background: "#1e293b",
+                border: "1px solid #3b82f6",
+                color: "#93c5fd",
+                fontSize: 10,
+                padding: "2px 8px",
+              }}
               onClick={handleAddKeyframeAtPlayhead}
               title="Añadir fotograma clave en el tiempo actual"
             >
@@ -226,7 +330,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         </div>
 
         {/* Snapping & blade tools */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <button className="am-tool-btn active" title="Snapping (N)">
             <Magnet size={11} color="#60a5fa" />
           </button>
@@ -236,21 +340,60 @@ export const Timeline: React.FC<TimelineProps> = ({
         </div>
 
         {/* Legend */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, fontSize: 10, color: 'var(--am-text-dim)' }}>
-          {timelineView === 'tracks' ? (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 10,
+            fontSize: 10,
+            color: "var(--am-text-dim)",
+          }}
+        >
+          {timelineView === "tracks" ? (
             <>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 7, height: 7, borderRadius: 2, background: '#6366f1' }} /> In
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 2,
+                    background: "#6366f1",
+                  }}
+                />{" "}
+                In
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 7, height: 7, borderRadius: 2, background: '#0284c7' }} /> Loop
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 2,
+                    background: "#0284c7",
+                  }}
+                />{" "}
+                Loop
               </span>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 7, height: 7, borderRadius: 2, background: '#e11d48' }} /> Out
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: 2,
+                    background: "#e11d48",
+                  }}
+                />{" "}
+                Out
               </span>
             </>
           ) : (
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#60a5fa' }}>
+            <span
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+                color: "#60a5fa",
+              }}
+            >
               ◆ Fotogramas Clave Arrastrables
             </span>
           )}
@@ -259,25 +402,46 @@ export const Timeline: React.FC<TimelineProps> = ({
 
       {/* STORYBOARD / DIAPOSITIVAS STRIP */}
       <div className="am-slides-strip">
-        <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 4 }}>
+        <span
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            color: "#94a3b8",
+            textTransform: "uppercase",
+            letterSpacing: 0.5,
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+          }}
+        >
           <Film size={12} color="#60a5fa" /> Diapositivas:
         </span>
         {slides.map((s, idx) => {
-          const isCurrent = currentTime >= s.startTime && currentTime < (s.startTime + s.duration);
+          const isCurrent =
+            currentTime >= s.startTime &&
+            currentTime < s.startTime + s.duration;
           return (
             <React.Fragment key={s.id}>
               {idx > 0 && (
                 <div className="am-slide-transition-badge">
-                  <Zap size={10} /> {slides[idx - 1].transition === 'neonFlash' ? '⚡ Neón Flash' : '🌊 Transición'}
+                  <Zap size={10} />{" "}
+                  {slides[idx - 1].transition === "neonFlash"
+                    ? "⚡ Neón Flash"
+                    : "🌊 Transición"}
                 </div>
               )}
               <button
-                className={'am-slide-pill ' + (isCurrent ? 'active' : '')}
+                className={"am-slide-pill " + (isCurrent ? "active" : "")}
                 onClick={() => onSeek(s.startTime)}
-                title={'Saltar a ' + s.title}
+                title={"Saltar a " + s.title}
               >
-                <span>{idx + 1}. {s.title}</span>
-                <span className="am-slide-time-badge">{s.startTime.toFixed(1)}s - {(s.startTime + s.duration).toFixed(1)}s</span>
+                <span>
+                  {idx + 1}. {s.title}
+                </span>
+                <span className="am-slide-time-badge">
+                  {s.startTime.toFixed(1)}s -{" "}
+                  {(s.startTime + s.duration).toFixed(1)}s
+                </span>
               </button>
             </React.Fragment>
           );
@@ -287,8 +451,27 @@ export const Timeline: React.FC<TimelineProps> = ({
       {/* TRACKS & RULER BODY */}
       <div className="am-timeline-body">
         {/* Left Track Headers */}
-        <div className="am-timeline-left-headers">
-          <div style={{ height: 26, borderBottom: '1px solid var(--am-border)', background: '#1c1d25', padding: '0 8px', display: 'flex', alignItems: 'center', fontSize: 10, fontWeight: 700, color: 'var(--am-text-dim)' }}>
+        <div
+          ref={leftHeadersRef}
+          className="am-timeline-left-headers"
+          onScroll={handleLeftHeadersScroll}
+        >
+          <div
+            style={{
+              height: 26,
+              position: "sticky",
+              top: 0,
+              zIndex: 20,
+              borderBottom: "1px solid var(--am-border)",
+              background: "#1c1d25",
+              padding: "0 8px",
+              display: "flex",
+              alignItems: "center",
+              fontSize: 10,
+              fontWeight: 700,
+              color: "var(--am-text-dim)",
+            }}
+          >
             TRACKS ({project.layers.length})
           </div>
           <div>
@@ -299,16 +482,23 @@ export const Timeline: React.FC<TimelineProps> = ({
                   key={layer.id}
                   className="am-track-row"
                   style={{
-                    padding: '0 8px',
-                    background: isSelected ? '#1f3527' : 'transparent',
-                    cursor: 'pointer',
-                    justifyContent: 'space-between',
+                    padding: "0 8px",
+                    background: isSelected ? "#1f3527" : "transparent",
+                    cursor: "pointer",
+                    justifyContent: "space-between",
                   }}
                   onClick={() => onSelectLayer(layer.id)}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 0 }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
+                      minWidth: 0,
+                    }}
+                  >
                     <div
-                      className={`am-check-box ${layer.visible ? 'checked' : ''}`}
+                      className={`am-check-box ${layer.visible ? "checked" : ""}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         onUpdateLayer({ ...layer, visible: !layer.visible });
@@ -321,10 +511,10 @@ export const Timeline: React.FC<TimelineProps> = ({
                       style={{
                         fontSize: 11,
                         fontWeight: isSelected ? 700 : 500,
-                        color: isSelected ? '#93c5fd' : 'var(--am-text)',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
+                        color: isSelected ? "#93c5fd" : "var(--am-text)",
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                       }}
                     >
                       {layer.name}
@@ -332,13 +522,20 @@ export const Timeline: React.FC<TimelineProps> = ({
                   </div>
 
                   <div
-                    style={{ cursor: 'pointer', opacity: layer.locked ? 1 : 0.3 }}
+                    style={{
+                      cursor: "pointer",
+                      opacity: layer.locked ? 1 : 0.3,
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       onUpdateLayer({ ...layer, locked: !layer.locked });
                     }}
                   >
-                    {layer.locked ? <Lock size={10} color="#f59e0b" /> : <Unlock size={10} />}
+                    {layer.locked ? (
+                      <Lock size={10} color="#f59e0b" />
+                    ) : (
+                      <Unlock size={10} />
+                    )}
                   </div>
                 </div>
               );
@@ -347,63 +544,107 @@ export const Timeline: React.FC<TimelineProps> = ({
         </div>
 
         {/* Right Scrollable Timeline with Playhead */}
-        <div className="am-timeline-tracks-scroll" ref={tracksContainerRef}>
-          {/* Frame Time Ruler */}
-          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 26, pointerEvents: 'none', zIndex: 3 }}>
-            {slides.map((s, idx) => (
-              <div
-                key={'ruler-' + s.id}
-                style={{
-                  position: 'absolute',
-                  left: s.startTime * pxPerSec,
-                  top: 2,
-                  fontSize: 9,
-                  fontWeight: 700,
-                  color: '#93c5fd',
-                  background: 'rgba(59, 130, 246, 0.12)',
-                  padding: '1px 6px',
-                  borderRadius: 2,
-                  borderLeft: idx > 0 ? '1px dashed #3b82f6' : 'none',
-                }}
-              >
-                {idx + 1}. {s.title.split(':')[0]}
-              </div>
-            ))}
-          </div>
-          <div className="am-timeline-ruler" onMouseDown={handleRulerMouseDown}>
-            {frameTicks.map((frame) => {
-              const sec = frame / fps;
-              return (
+        <div
+          className="am-timeline-tracks-scroll"
+          ref={tracksContainerRef}
+          onScroll={handleTracksScroll}
+        >
+          {/* Frame Time Ruler (Sticky at top) */}
+          <div
+            style={{
+              position: "sticky",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: 26,
+              zIndex: 20,
+              background: "#181920",
+              borderBottom: "1px solid var(--am-border)",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 26,
+                pointerEvents: "none",
+                zIndex: 3,
+              }}
+            >
+              {slides.map((s, idx) => (
                 <div
-                  key={frame}
-                  className="am-ruler-tick"
-                  style={{ left: sec * pxPerSec }}
+                  key={"ruler-" + s.id}
+                  style={{
+                    position: "absolute",
+                    left: s.startTime * pxPerSec,
+                    top: 2,
+                    fontSize: 9,
+                    fontWeight: 700,
+                    color: "#93c5fd",
+                    background: "rgba(59, 130, 246, 0.12)",
+                    padding: "1px 6px",
+                    borderRadius: 2,
+                    borderLeft: idx > 0 ? "1px dashed #3b82f6" : "none",
+                  }}
                 >
-                  <span>{frame === 0 ? '1' : frame}</span>
+                  {idx + 1}. {s.title.split(":")[0]}
                 </div>
-              );
-            })}
+              ))}
+            </div>
+            <div className="am-timeline-ruler" onMouseDown={handleRulerMouseDown}>
+              {frameTicks.map((frame) => {
+                const sec = frame / fps;
+                return (
+                  <div
+                    key={frame}
+                    className="am-ruler-tick"
+                    style={{ left: sec * pxPerSec }}
+                  >
+                    <span>{frame === 0 ? "1" : frame}</span>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           {/* Red Playhead Line & Needle */}
-          <div className="am-playhead-line" style={{ left: playheadX }}>
-            <div className="am-playhead-needle" onMouseDown={handleRulerMouseDown} />
+          <div
+            className="am-playhead-line"
+            style={{
+              left: playheadX,
+              height: Math.max(220, 26 + project.layers.length * 30 + 40),
+            }}
+          >
+            <div
+              className="am-playhead-needle"
+              onMouseDown={handleRulerMouseDown}
+            />
           </div>
 
           {/* Layer Tracks / Keyframes */}
-          <div style={{ position: 'relative' }}>
+          <div style={{ position: "relative" }}>
             {project.layers.map((layer) => {
               const isSelected = layer.id === selectedLayerId;
 
               const inStart = layer.inAnimation.start;
-              const inEnd = layer.inAnimation.start + layer.inAnimation.duration;
+              const inEnd =
+                layer.inAnimation.start + layer.inAnimation.duration;
               const outStart = layer.outAnimation.start;
-              const outEnd = layer.outAnimation.start + layer.outAnimation.duration;
+              const outEnd =
+                layer.outAnimation.start + layer.outAnimation.duration;
 
               const inLeft = inStart * pxPerSec;
-              const inWidth = Math.max(16, layer.inAnimation.duration * pxPerSec);
+              const inWidth = Math.max(
+                16,
+                layer.inAnimation.duration * pxPerSec,
+              );
               const outLeft = outStart * pxPerSec;
-              const outWidth = Math.max(16, layer.outAnimation.duration * pxPerSec);
+              const outWidth = Math.max(
+                16,
+                layer.outAnimation.duration * pxPerSec,
+              );
               const loopLeft = inEnd * pxPerSec;
               const loopWidth = Math.max(0, outLeft - loopLeft);
 
@@ -412,16 +653,18 @@ export const Timeline: React.FC<TimelineProps> = ({
                   key={layer.id}
                   className="am-track-row"
                   style={{
-                    background: isSelected ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
+                    background: isSelected
+                      ? "rgba(59, 130, 246, 0.08)"
+                      : "transparent",
                     width: duration * pxPerSec + 100,
                   }}
                   onClick={() => onSelectLayer(layer.id)}
                 >
-                  {timelineView === 'tracks' ? (
+                  {timelineView === "tracks" ? (
                     /* 1. TRACKS BLOCK VIEW */
                     <>
                       {/* IN CLIP */}
-                      {layer.inAnimation.type !== 'none' && (
+                      {layer.inAnimation.type !== "none" && (
                         <div
                           className="am-track-clip am-clip-in"
                           style={{ left: inLeft, width: inWidth }}
@@ -430,7 +673,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                             onSelectLayer(layer.id);
                             setDraggingClip({
                               layerId: layer.id,
-                              clipType: 'in',
+                              clipType: "in",
                               startX: e.clientX,
                               initialStart: inStart,
                               initialDuration: layer.inAnimation.duration,
@@ -443,7 +686,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                       )}
 
                       {/* LOOP BAR */}
-                      {layer.loopAnimation.type !== 'none' && loopWidth > 5 && (
+                      {layer.loopAnimation.type !== "none" && loopWidth > 5 && (
                         <div
                           className="am-track-clip am-clip-loop"
                           style={{ left: loopLeft, width: loopWidth }}
@@ -453,7 +696,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                       )}
 
                       {/* OUT CLIP */}
-                      {layer.outAnimation.type !== 'none' && (
+                      {layer.outAnimation.type !== "none" && (
                         <div
                           className="am-track-clip am-clip-out"
                           style={{ left: outLeft, width: outWidth }}
@@ -462,7 +705,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                             onSelectLayer(layer.id);
                             setDraggingClip({
                               layerId: layer.id,
-                              clipType: 'out',
+                              clipType: "out",
                               startX: e.clientX,
                               initialStart: outStart,
                               initialDuration: layer.outAnimation.duration,
@@ -496,7 +739,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                           onSelectLayer(layer.id);
                           setDraggingKeyframe({
                             layerId: layer.id,
-                            keyType: 'inStart',
+                            keyType: "inStart",
                             startX: e.clientX,
                             initialTime: inStart,
                           });
@@ -513,7 +756,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                           onSelectLayer(layer.id);
                           setDraggingKeyframe({
                             layerId: layer.id,
-                            keyType: 'inEnd',
+                            keyType: "inEnd",
                             startX: e.clientX,
                             initialTime: inEnd,
                           });
@@ -530,7 +773,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                           onSelectLayer(layer.id);
                           setDraggingKeyframe({
                             layerId: layer.id,
-                            keyType: 'outStart',
+                            keyType: "outStart",
                             startX: e.clientX,
                             initialTime: outStart,
                           });
@@ -547,7 +790,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                           onSelectLayer(layer.id);
                           setDraggingKeyframe({
                             layerId: layer.id,
-                            keyType: 'outEnd',
+                            keyType: "outEnd",
                             startX: e.clientX,
                             initialTime: outEnd,
                           });
@@ -564,7 +807,7 @@ export const Timeline: React.FC<TimelineProps> = ({
 
       {/* FOOTER ZOOM SLIDER */}
       <div className="am-timeline-footer">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <span>Zoom:</span>
           <span>Small</span>
           <input
@@ -573,13 +816,20 @@ export const Timeline: React.FC<TimelineProps> = ({
             max="300"
             value={zoomLevel}
             onChange={(e) => setZoomLevel(parseInt(e.target.value))}
-            style={{ width: 100, accentColor: 'var(--movent-bright)', cursor: 'pointer' }}
+            style={{
+              width: 100,
+              accentColor: "#3b82f6",
+              cursor: "pointer",
+            }}
           />
           <span>Large</span>
         </div>
 
         <div>
-          <span>{project.settings.duration}s total duration • {Math.round(project.settings.duration * fps)} frames</span>
+          <span>
+            {project.settings.duration}s total duration •{" "}
+            {Math.round(project.settings.duration * fps)} frames
+          </span>
         </div>
       </div>
     </div>

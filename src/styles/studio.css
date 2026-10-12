@@ -1,11 +1,11 @@
 :root {
   /* Paleta Movent */
   --movent-background: #030907;
-  --movent-forest: #063D29;
-  --movent-green: #178D1B;
-  --movent-bright: #23C83C;
-  --movent-teal: #007B49;
-  --movent-white: #FFFFFF;
+  --movent-forest: #063d29;
+  --movent-green: #178d1b;
+  --movent-bright: #23c83c;
+  --movent-teal: #007b49;
+  --movent-white: #ffffff;
 
   /* Apple Motion Pro UI Colors */
   --am-bg-dark: #121316;
@@ -37,7 +37,9 @@
 body {
   background-color: var(--am-bg-dark);
   color: var(--am-text);
-  font-family: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Plus Jakarta Sans", system-ui,
+    sans-serif;
   overflow: hidden;
   height: 100vh;
   width: 100vw;
@@ -168,8 +170,8 @@ body {
 }
 
 .am-btn-primary {
-  background: linear-gradient(180deg, #2b7042 0%, #178D1B 100%);
-  border: 1px solid #23C83C;
+  background: linear-gradient(180deg, #2b7042 0%, #178d1b 100%);
+  border: 1px solid #23c83c;
   color: #fff;
   font-size: 11px;
   font-weight: 700;
@@ -188,7 +190,7 @@ body {
 }
 
 .am-btn-ai {
-  background: linear-gradient(180deg, #1d3326 0%, #063D29 100%);
+  background: linear-gradient(180deg, #1d3326 0%, #063d29 100%);
   border: 1px solid rgba(35, 200, 60, 0.5);
   color: var(--movent-bright);
   font-size: 11px;
@@ -397,8 +399,10 @@ body {
   aspect-ratio: 9 / 16;
   max-width: calc((100% - 10px) * 9 / 16);
   background: #030907;
-  border: 1px solid #23C83C;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.9), 0 0 25px rgba(35, 200, 60, 0.15);
+  border: 1px solid #23c83c;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.9),
+    0 0 25px rgba(35, 200, 60, 0.15);
   border-radius: var(--radius-xs);
   overflow: hidden;
   display: flex;
@@ -442,7 +446,7 @@ body {
   border: 1px solid #282a35;
   border-radius: var(--radius-xs);
   padding: 2px 10px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 12px;
   font-weight: 700;
   color: var(--movent-bright);
@@ -465,12 +469,13 @@ body {
 
 /* Bottom Pane: Apple Motion Timeline */
 .am-timeline-container {
-  height: 250px;
+  height: clamp(270px, 32vh, 360px);
   background: #131418;
   border-top: 1px solid var(--am-border);
   display: flex;
   flex-direction: column;
   z-index: 50;
+  flex-shrink: 0;
 }
 
 .am-timeline-header {
@@ -481,6 +486,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
+  flex-shrink: 0;
 }
 
 .am-timeline-body {
@@ -488,21 +494,28 @@ body {
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .am-timeline-left-headers {
   width: 220px;
   background: #17181f;
   border-right: 1px solid var(--am-border);
-  overflow-y: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+  scrollbar-color: #383a48 transparent;
 }
 
 .am-timeline-tracks-scroll {
   flex: 1;
   background: #0e0f13;
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   position: relative;
+  scrollbar-width: thin;
+  scrollbar-color: #383a48 #111218;
 }
 
 .am-timeline-ruler {
@@ -518,7 +531,7 @@ body {
   top: 0;
   bottom: 0;
   padding-left: 4px;
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 9px;
   color: var(--am-text-faint);
   border-left: 1px solid #282a35;
@@ -717,7 +730,7 @@ body {
 }
 
 .am-field-value-badge {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: "JetBrains Mono", monospace;
   font-size: 10px;
   font-weight: 600;
   background: #101117;
@@ -749,7 +762,9 @@ body {
 /* Apple Motion Styled Select */
 .am-select {
   width: 100%;
-  background: #14151b url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238b8e9b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E") no-repeat right 8px center !important;
+  background: #14151b
+    url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%238b8e9b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E")
+    no-repeat right 8px center !important;
   border: 1px solid #282a35 !important;
   color: #fff !important;
   font-size: 11.5px;
@@ -873,7 +888,9 @@ body {
   background: #181922 !important;
   border: 1px solid #333544 !important;
   border-radius: 12px !important;
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(35, 200, 60, 0.18) !important;
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.9),
+    0 0 40px rgba(35, 200, 60, 0.18) !important;
   width: 90% !important;
   max-width: 680px !important;
   max-height: 85vh !important;
@@ -893,7 +910,8 @@ body {
 }
 
 .modal-title {
-  font-family: -apple-system, BlinkMacSystemFont, 'Outfit', sans-serif !important;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Outfit", sans-serif !important;
   font-size: 15px !important;
   font-weight: 700 !important;
   color: #fff !important;
@@ -933,8 +951,8 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(180deg, #2b7042 0%, #178D1B 100%) !important;
-  border: 1px solid #23C83C !important;
+  background: linear-gradient(180deg, #2b7042 0%, #178d1b 100%) !important;
+  border: 1px solid #23c83c !important;
   color: #fff !important;
   font-weight: 700 !important;
   box-shadow: 0 0 16px rgba(35, 200, 60, 0.3) !important;
@@ -946,7 +964,7 @@ body {
 }
 
 .btn-ai {
-  background: linear-gradient(180deg, #1d3326 0%, #063D29 100%) !important;
+  background: linear-gradient(180deg, #1d3326 0%, #063d29 100%) !important;
   border: 1px solid rgba(35, 200, 60, 0.5) !important;
   color: var(--movent-bright) !important;
 }
@@ -1031,8 +1049,8 @@ body {
 
 /* Glowing Preview Button */
 .am-btn-preview {
-  background: linear-gradient(180deg, #2b7042 0%, #178D1B 100%) !important;
-  border: 1px solid #23C83C !important;
+  background: linear-gradient(180deg, #2b7042 0%, #178d1b 100%) !important;
+  border: 1px solid #23c83c !important;
   color: #fff !important;
   font-weight: 700 !important;
   padding: 5px 14px !important;
@@ -1050,10 +1068,15 @@ body {
 }
 
 @keyframes amFadeIn {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-
 
 /* Storyboard / Diapositivas Strip */
 .am-slides-strip {
