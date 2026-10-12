@@ -216,7 +216,7 @@ export const Timeline: React.FC<TimelineProps> = ({
           {timelineView === 'keyframes' && (
             <button
               className="am-tool-btn"
-              style={{ background: '#223c2d', border: '1px solid var(--movent-bright)', color: '#fff', fontSize: 10, padding: '2px 8px' }}
+              style={{ background: '#1e293b', border: '1px solid #3b82f6', color: '#93c5fd', fontSize: 10, padding: '2px 8px' }}
               onClick={handleAddKeyframeAtPlayhead}
               title="Añadir fotograma clave en el tiempo actual"
             >
@@ -228,7 +228,7 @@ export const Timeline: React.FC<TimelineProps> = ({
         {/* Snapping & blade tools */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <button className="am-tool-btn active" title="Snapping (N)">
-            <Magnet size={11} color="var(--movent-bright)" />
+            <Magnet size={11} color="#60a5fa" />
           </button>
           <button className="am-tool-btn" title="Blade Tool (B)">
             <Scissors size={11} />
@@ -240,17 +240,17 @@ export const Timeline: React.FC<TimelineProps> = ({
           {timelineView === 'tracks' ? (
             <>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 7, height: 7, borderRadius: 2, background: 'var(--movent-bright)' }} /> In
+                <span style={{ width: 7, height: 7, borderRadius: 2, background: '#6366f1' }} /> In
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 7, height: 7, borderRadius: 2, background: 'var(--movent-teal)' }} /> Loop
+                <span style={{ width: 7, height: 7, borderRadius: 2, background: '#0284c7' }} /> Loop
               </span>
               <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 7, height: 7, borderRadius: 2, background: '#bf263c' }} /> Out
+                <span style={{ width: 7, height: 7, borderRadius: 2, background: '#e11d48' }} /> Out
               </span>
             </>
           ) : (
-            <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--movent-bright)' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#60a5fa' }}>
               ◆ Fotogramas Clave Arrastrables
             </span>
           )}
@@ -259,8 +259,8 @@ export const Timeline: React.FC<TimelineProps> = ({
 
       {/* STORYBOARD / DIAPOSITIVAS STRIP */}
       <div className="am-slides-strip">
-        <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--movent-bright)', textTransform: 'uppercase', letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 4 }}>
-          <Film size={12} /> Diapositivas:
+        <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 0.5, display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Film size={12} color="#60a5fa" /> Diapositivas:
         </span>
         {slides.map((s, idx) => {
           const isCurrent = currentTime >= s.startTime && currentTime < (s.startTime + s.duration);
@@ -321,7 +321,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                       style={{
                         fontSize: 11,
                         fontWeight: isSelected ? 700 : 500,
-                        color: isSelected ? 'var(--movent-bright)' : 'var(--am-text)',
+                        color: isSelected ? '#93c5fd' : 'var(--am-text)',
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -338,7 +338,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                       onUpdateLayer({ ...layer, locked: !layer.locked });
                     }}
                   >
-                    {layer.locked ? <Lock size={10} color="var(--movent-bright)" /> : <Unlock size={10} />}
+                    {layer.locked ? <Lock size={10} color="#f59e0b" /> : <Unlock size={10} />}
                   </div>
                 </div>
               );
@@ -359,11 +359,11 @@ export const Timeline: React.FC<TimelineProps> = ({
                   top: 2,
                   fontSize: 9,
                   fontWeight: 700,
-                  color: 'var(--movent-bright)',
-                  background: 'rgba(35, 200, 60, 0.1)',
+                  color: '#93c5fd',
+                  background: 'rgba(59, 130, 246, 0.12)',
                   padding: '1px 6px',
                   borderRadius: 2,
-                  borderLeft: idx > 0 ? '1px dashed var(--movent-bright)' : 'none',
+                  borderLeft: idx > 0 ? '1px dashed #3b82f6' : 'none',
                 }}
               >
                 {idx + 1}. {s.title.split(':')[0]}
@@ -412,7 +412,7 @@ export const Timeline: React.FC<TimelineProps> = ({
                   key={layer.id}
                   className="am-track-row"
                   style={{
-                    background: isSelected ? 'rgba(35, 200, 60, 0.05)' : 'transparent',
+                    background: isSelected ? 'rgba(59, 130, 246, 0.08)' : 'transparent',
                     width: duration * pxPerSec + 100,
                   }}
                   onClick={() => onSelectLayer(layer.id)}

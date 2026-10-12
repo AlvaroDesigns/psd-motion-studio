@@ -173,10 +173,10 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
       {activeTab === 'behaviors' && (
         <>
           {/* ASIGNACIÓN A DIAPOSITIVA (STORYBOARD SLIDE) */}
-          <div className="am-section-card" style={{ border: '1px solid #1a3a28', background: '#0b1611', marginBottom: 12 }}>
+          <div className="am-section-card" style={{ border: '1px solid var(--am-border)', background: '#161720', marginBottom: 12 }}>
             <div className="am-section-title">
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--movent-bright)' }}>
-                <Film size={13} /> ASIGNACIÓN A DIAPOSITIVA
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2e8f0' }}>
+                <Film size={13} color="#60a5fa" /> ASIGNACIÓN A DIAPOSITIVA
               </span>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6, marginBottom: 8 }}>
@@ -190,8 +190,8 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 2,
-                  background: (layer.inAnimation.start < 1.0 && layer.outAnimation.start < 3.0 && layer.outAnimation.type !== 'none') ? '#184729' : '#141d17',
-                  border: (layer.inAnimation.start < 1.0 && layer.outAnimation.start < 3.0 && layer.outAnimation.type !== 'none') ? '1px solid var(--movent-bright)' : '1px solid #24352a',
+                  background: (layer.inAnimation.start < 1.0 && layer.outAnimation.start < 3.0 && layer.outAnimation.type !== 'none') ? '#1e293b' : '#14151c',
+                  border: (layer.inAnimation.start < 1.0 && layer.outAnimation.start < 3.0 && layer.outAnimation.type !== 'none') ? '1px solid #3b82f6' : '1px solid #282a36',
                   color: '#fff',
                 }}
                 onClick={() => {
@@ -202,7 +202,7 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
                   });
                 }}
               >
-                <span style={{ fontWeight: 700, color: 'var(--movent-bright)' }}>1. Intro Logo</span>
+                <span style={{ fontWeight: 700, color: (layer.inAnimation.start < 1.0 && layer.outAnimation.start < 3.0 && layer.outAnimation.type !== 'none') ? '#93c5fd' : '#cbd5e1' }}>1. Intro Logo</span>
                 <span style={{ fontSize: 9, opacity: 0.7 }}>0.1s — 2.5s</span>
               </button>
 
@@ -216,8 +216,8 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 2,
-                  background: (layer.inAnimation.start >= 2.0) ? '#184729' : '#141d17',
-                  border: (layer.inAnimation.start >= 2.0) ? '1px solid var(--movent-bright)' : '1px solid #24352a',
+                  background: (layer.inAnimation.start >= 2.0) ? '#1e293b' : '#14151c',
+                  border: (layer.inAnimation.start >= 2.0) ? '1px solid #3b82f6' : '1px solid #282a36',
                   color: '#fff',
                 }}
                 onClick={() => {
@@ -228,7 +228,7 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
                   });
                 }}
               >
-                <span style={{ fontWeight: 700, color: 'var(--movent-bright)' }}>2. Flyer Principal</span>
+                <span style={{ fontWeight: 700, color: (layer.inAnimation.start >= 2.0) ? '#93c5fd' : '#cbd5e1' }}>2. Flyer Principal</span>
                 <span style={{ fontSize: 9, opacity: 0.7 }}>2.5s — {totalDuration.toFixed(1)}s</span>
               </button>
             </div>
@@ -240,8 +240,8 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
                 width: '100%',
                 padding: '4px 8px',
                 fontSize: 10,
-                background: (layer.inAnimation.start < 1.0 && (layer.outAnimation.start >= 4.0 || layer.outAnimation.type === 'none')) ? '#184729' : '#141d17',
-                border: (layer.inAnimation.start < 1.0 && (layer.outAnimation.start >= 4.0 || layer.outAnimation.type === 'none')) ? '1px solid var(--movent-bright)' : '1px solid #24352a',
+                background: (layer.inAnimation.start < 1.0 && (layer.outAnimation.start >= 4.0 || layer.outAnimation.type === 'none')) ? '#1e293b' : '#14151c',
+                border: (layer.inAnimation.start < 1.0 && (layer.outAnimation.start >= 4.0 || layer.outAnimation.type === 'none')) ? '1px solid #3b82f6' : '1px solid #282a36',
                 color: (layer.inAnimation.start < 1.0 && (layer.outAnimation.start >= 4.0 || layer.outAnimation.type === 'none')) ? '#fff' : '#aaa',
               }}
               onClick={() => {
@@ -258,8 +258,8 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
           {/* 1. ENTRADA (IN ANIMATION) */}
           <div className="am-section-card">
             <div className="am-section-title">
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--movent-bright)' }}>
-                <PlayCircle size={13} /> ANIMACIÓN DE ENTRADA
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2e8f0' }}>
+                <PlayCircle size={13} color="#818cf8" /> ANIMACIÓN DE ENTRADA
               </span>
             </div>
 
@@ -522,8 +522,8 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
       {activeTab === 'filters' && (
         <div className="am-section-card">
           <div className="am-section-title">
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--movent-bright)' }}>
-              <Sparkles size={13} /> EFECTOS ESPECIALES
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#e2e8f0' }}>
+              <Sparkles size={13} color="#818cf8" /> EFECTOS ESPECIALES
             </span>
           </div>
 

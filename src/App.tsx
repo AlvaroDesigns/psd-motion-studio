@@ -260,7 +260,7 @@ export function App() {
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
           >
-            <Upload size={12} color="var(--movent-bright)" />
+            <Upload size={12} color="#94a3b8" />
             {isUploading ? 'Importando...' : 'Import PSD'}
           </button>
         </div>
@@ -269,7 +269,7 @@ export function App() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {/* PLANTILLAS DE ANIMACIÓN DROPDOWN */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 10, fontWeight: 700, color: 'var(--movent-bright)', textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
               Plantilla:
             </span>
             <select
@@ -432,7 +432,7 @@ export function App() {
                     }}
                     title={layer.locked ? 'Bloqueada' : 'Desbloqueada'}
                   >
-                    {layer.locked ? <Lock size={11} color="var(--movent-bright)" /> : <Unlock size={11} />}
+                    {layer.locked ? <Lock size={11} color="#f59e0b" /> : <Unlock size={11} />}
                   </div>
                 </div>
               );
