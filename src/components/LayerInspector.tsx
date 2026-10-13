@@ -145,11 +145,54 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
               onChange={(e) => onUpdateLayer({ ...layer, blendMode: e.target.value as GlobalCompositeOperation })}
             >
               <option value="source-over">Normal</option>
-              <option value="screen">Screen (Trama)</option>
-              <option value="overlay">Overlay (Superponer)</option>
-              <option value="lighter">Lighter (Añadir)</option>
-              <option value="multiply">Multiply (Multiplicar)</option>
+              <option value="screen">Screen / Trama (Quita fondo negro/luces)</option>
+              <option value="multiply">Multiply / Multiplicar (Quita fondo blanco)</option>
+              <option value="overlay">Overlay / Superponer</option>
+              <option value="lighter">Lighter / Añadir (Alta luminosidad)</option>
+              <option value="color-dodge">Color Dodge / Sobreexponer color</option>
+              <option value="soft-light">Soft Light / Luz suave</option>
+              <option value="hard-light">Hard Light / Luz fuerte</option>
             </select>
+
+            {/* Quick helper buttons for transparent blending */}
+            <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>
+              <button
+                type="button"
+                className={`am-quick-chip ${layer.blendMode === 'screen' ? 'active' : ''}`}
+                style={{
+                  flex: 1,
+                  fontSize: 10,
+                  padding: '4px 6px',
+                  background: layer.blendMode === 'screen' ? 'rgba(35, 200, 60, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                  border: layer.blendMode === 'screen' ? '1px solid #23c83c' : '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: 4,
+                  color: layer.blendMode === 'screen' ? '#23c83c' : 'var(--am-text-dim)',
+                  cursor: 'pointer',
+                }}
+                onClick={() => onUpdateLayer({ ...layer, blendMode: 'screen' })}
+                title="Para destellos, fuego o capas con fondo negro"
+              >
+                ✨ Modo Trama
+              </button>
+              <button
+                type="button"
+                className={`am-quick-chip ${layer.blendMode === 'multiply' ? 'active' : ''}`}
+                style={{
+                  flex: 1,
+                  fontSize: 10,
+                  padding: '4px 6px',
+                  background: layer.blendMode === 'multiply' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                  border: layer.blendMode === 'multiply' ? '1px solid #3b82f6' : '1px solid rgba(255, 255, 255, 0.1)',
+                  borderRadius: 4,
+                  color: layer.blendMode === 'multiply' ? '#60a5fa' : 'var(--am-text-dim)',
+                  cursor: 'pointer',
+                }}
+                onClick={() => onUpdateLayer({ ...layer, blendMode: 'multiply' })}
+                title="Para siluetas, logos o capas con fondo blanco"
+              >
+                📄 Multiplicar
+              </button>
+            </div>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 4 }}>

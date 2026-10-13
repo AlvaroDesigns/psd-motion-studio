@@ -141,6 +141,128 @@ function getDefaultAnimationsForRole(role: LayerRole, index: number, normY?: num
   }
 }
 
+function mapPsdBlendMode(mode?: string): GlobalCompositeOperation {
+  if (!mode) return 'source-over';
+  const m = mode.toLowerCase().trim();
+  switch (m) {
+    case 'screen':
+      return 'screen';
+    case 'linear dodge':
+    case 'linear dodge (add)':
+    case 'lighter color':
+      return 'lighter';
+    case 'multiply':
+      return 'multiply';
+    case 'overlay':
+      return 'overlay';
+    case 'darken':
+    case 'darker color':
+      return 'darken';
+    case 'lighten':
+      return 'lighten';
+    case 'color dodge':
+      return 'color-dodge';
+    case 'color burn':
+    case 'linear burn':
+      return 'color-burn';
+    case 'hard light':
+      return 'hard-light';
+    case 'soft light':
+      return 'soft-light';
+    case 'difference':
+      return 'difference';
+    case 'exclusion':
+      return 'exclusion';
+    case 'hue':
+      return 'hue';
+    case 'saturation':
+      return 'saturation';
+    case 'color':
+      return 'color';
+    case 'luminosity':
+      return 'luminosity';
+    case 'normal':
+    case 'pass through':
+    default:
+      return 'source-over';
+  }
+}
+
+function applyMaskToCanvas(
+  layerCanvas: HTMLCanvasElement,
+  layerLeft: number,
+  layerTop: number,
+  mask: any
+): HTMLCanvasElement {
+  if (!mask || mask.disabled) return layerCanvas;
+
+  let maskCanvas: HTMLCanvasElement | undefined = mask.canvas;
+  if (!maskCanvas && mask.imageData) {
+    try {
+      maskCanvas = document.createElement('canvas');
+      maskCanvas.width = mask.imageData.width;
+      maskCanvas.height = mask.imageData.height;
+      const mCtx = maskCanvas.getContext('2d');
+      if (mCtx) mCtx.putImageData(mask.imageData, 0, 0);
+    } catch {
+      maskCanvas = undefined;
+    }
+  }
+
+  if (!maskCanvas) return layerCanvas;
+
+  const w = layerCanvas.width;
+  const h = layerCanvas.height;
+  if (w <= 0 || h <= 0) return layerCanvas;
+
+  try {
+    const outputCanvas = document.createElement('canvas');
+    outputCanvas.width = w;
+    outputCanvas.height = h;
+    const outCtx = outputCanvas.getContext('2d');
+    if (!outCtx) return layerCanvas;
+
+    outCtx.drawImage(layerCanvas, 0, 0);
+
+    const imgData = outCtx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    const mCtx = maskCanvas.getContext('2d');
+    if (!mCtx) return layerCanvas;
+    const maskW = maskCanvas.width;
+    const maskH = maskCanvas.height;
+    const maskImgData = mCtx.getImageData(0, 0, maskW, maskH);
+    const maskData = maskImgData.data;
+
+    const maskLeft = (mask.left ?? layerLeft) - layerLeft;
+    const maskTop = (mask.top ?? layerTop) - layerTop;
+    const defaultAlpha = (mask.defaultColor ?? 0) === 255 ? 1 : 0;
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const idx = (y * w + x) * 4;
+        const mx = x - maskLeft;
+        const my = y - maskTop;
+
+        let maskVal = defaultAlpha;
+        if (mx >= 0 && mx < maskW && my >= 0 && my < maskH) {
+          const mIdx = (my * maskW + mx) * 4;
+          // Grayscale mask: R channel represents mask luminance (0=transparent, 255=opaque)
+          maskVal = maskData[mIdx] / 255;
+        }
+
+        data[idx + 3] = Math.round(data[idx + 3] * maskVal);
+      }
+    }
+
+    outCtx.putImageData(imgData, 0, 0);
+    return outputCanvas;
+  } catch (err) {
+    console.warn('Error applying layer mask:', err);
+    return layerCanvas;
+  }
+}
+
 /**
  * Parses a File (PSD format) and outputs a fully reconstructed SceneProject
  */
@@ -166,15 +288,27 @@ export async function parsePsdFile(file: File): Promise<SceneProject> {
       return;
     }
 
-    // Only process visible or printable layers with actual dimensions
+    let layerCanvas: HTMLCanvasElement | undefined = node.canvas || node.image;
+
+    // Skip adjustment layers, empty groups or non-raster nodes without image data
+    // (Prevents generating phantom translucent white boxes)
+    if (!layerCanvas) {
+      return;
+    }
+
     const layerName = node.name || `Layer_${sceneLayers.length + 1}`;
     const left = node.left ?? 0;
     const top = node.top ?? 0;
-    const right = node.right ?? left + (node.canvas?.width || 0);
-    const bottom = node.bottom ?? top + (node.canvas?.height || 0);
+    const right = node.right ?? left + layerCanvas.width;
+    const bottom = node.bottom ?? top + layerCanvas.height;
 
     const layerW = Math.max(1, right - left);
     const layerH = Math.max(1, bottom - top);
+
+    // Apply Photoshop layer mask if present
+    if (node.mask && !node.mask.disabled) {
+      layerCanvas = applyMaskToCanvas(layerCanvas, left, top, node.mask);
+    }
 
     // Coordinate mapping to 1080x1920 viewport
     const normX = Math.round(left * scale + (1080 - rawWidth * scale) / 2);
@@ -183,27 +317,7 @@ export async function parsePsdFile(file: File): Promise<SceneProject> {
     const normH = Math.round(layerH * scale);
 
     const role = detectLayerRole(layerName, normY, normW, normH);
-
-    let layerCanvas: HTMLCanvasElement | undefined = node.canvas;
-
-    if (!layerCanvas && node.image) {
-      layerCanvas = node.image;
-    }
-
-    if (!layerCanvas) {
-      // Create a dummy canvas with label if missing raster data
-      layerCanvas = document.createElement('canvas');
-      layerCanvas.width = Math.max(10, normW);
-      layerCanvas.height = Math.max(10, normH);
-      const ctx = layerCanvas.getContext('2d');
-      if (ctx) {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-        ctx.fillRect(0, 0, layerCanvas.width, layerCanvas.height);
-        ctx.strokeStyle = '#00f0ff';
-        ctx.strokeRect(0, 0, layerCanvas.width, layerCanvas.height);
-      }
-    }
-
+    const blendMode = mapPsdBlendMode(node.blendMode);
     const animDefaults = getDefaultAnimationsForRole(role, sceneLayers.length, normY, normX);
 
     const layer: SceneLayer = {
@@ -215,7 +329,7 @@ export async function parsePsdFile(file: File): Promise<SceneProject> {
       width: normW,
       height: normH,
       opacity: node.opacity !== undefined ? node.opacity : 1,
-      blendMode: 'source-over',
+      blendMode,
       visible: node.hidden ? false : true,
       locked: role === 'background',
       canvas: layerCanvas,
