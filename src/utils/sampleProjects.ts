@@ -1745,35 +1745,8 @@ export interface DemoProjectMeta {
 
 export const SAMPLE_PROJECTS_LIST: DemoProjectMeta[] = [
   {
-    id: 'afro_live',
-    name: '🌴 Afro@Live (MotionDesignArt)',
-    category: 'Afrobeat & Amapiano',
-    description: 'Flyer animado tropical a 112 BPM, resplandor dorado, percusión visual y tipografía cinética con haz de luz.',
-    badge: 'Afrobeat',
-    color: '#ffaa00',
-    create: createAfroLiveProject,
-  },
-  {
-    id: 'fiesta_latina',
-    name: '🔥 Fiesta Latina Dembow Fest',
-    category: 'Latin Urban & Reggaeton',
-    description: 'Alta energía dembow a 98 BPM, neón fucsia/oro, zoom bursts en caídas y pulsos rítmicos.',
-    badge: 'Reggaeton',
-    color: '#ff0055',
-    create: createFiestaLatinaProject,
-  },
-  {
-    id: 'nexus_electronic',
-    name: '⚡ Nexus Electronic Festival (Spec)',
-    category: 'Electronic Music Festival',
-    description: 'Festival EDM futurista en Ibiza con hexágono 3D holográfico, láseres cian/magenta y lineup estelar.',
-    badge: 'Electronic',
-    color: '#00f0ff',
-    create: createElectronicFestivalProject,
-  },
-  {
     id: 'movent_brand',
-    name: '🎞️ Movent Brand — 2 Diapositivas',
+    name: '🎞️ Movent Brand — Demo Oficial',
     category: 'Multi-Slide Brand Story',
     description: 'Diapositiva 1 (0-2.5s) con revelación de Logo Neón verde #23C83C + Diapositiva 2 con Flyer completo.',
     badge: '2 Slides',

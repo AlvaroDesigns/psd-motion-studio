@@ -81,22 +81,22 @@ export const StudioViewport: React.FC<StudioViewportProps> = ({
       const state = computeLayerState(layer, currentTime, project.settings.duration);
       renderLayerToCanvas(ctx, layer, state);
 
-      // Apple Motion style selection highlight
-      if (layer.id === selectedLayerId && state.visible) {
+      // Apple Motion style selection highlight (only when paused/editing, hidden during playback)
+      if (layer.id === selectedLayerId && state.visible && !isPlaying) {
         ctx.save();
-        ctx.strokeStyle = '#23C83C';
-        ctx.lineWidth = 3;
-        ctx.setLineDash([8, 6]);
+        ctx.strokeStyle = 'rgba(35, 200, 60, 0.75)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 5]);
         const cx = layer.x + layer.width / 2 + state.translateX;
         const cy = layer.y + layer.height / 2 + state.translateY;
         ctx.translate(cx, cy);
         if (state.rotation !== 0) ctx.rotate((state.rotation * Math.PI) / 180);
         ctx.scale(state.scaleX, state.scaleY);
-        ctx.strokeRect(-layer.width / 2 - 4, -layer.height / 2 - 4, layer.width + 8, layer.height + 8);
+        ctx.strokeRect(-layer.width / 2 - 3, -layer.height / 2 - 3, layer.width + 6, layer.height + 6);
         ctx.restore();
       }
     }
-  }, [project, currentTime, selectedLayerId]);
+  }, [project, currentTime, selectedLayerId, isPlaying]);
 
   // Frame count calculation (e.g. 000104 like Apple Motion in Image 2)
   const currentFrame = Math.round(currentTime * project.settings.fps);

@@ -25,116 +25,70 @@ function detectLayerRole(name: string, normY?: number, normW?: number, normH?: n
   return 'custom';
 }
 
-function getDefaultAnimationsForRole(role: LayerRole, index: number, normY?: number, normX?: number) {
+function getDefaultAnimationsForRole(role: LayerRole, index: number) {
   switch (role) {
     case 'background':
       return {
-        inAnimation: { type: 'fadeIn' as const, start: 0.0, duration: 0.6, easing: 'linear' as const },
-        loopAnimation: { type: 'slowZoom' as const, start: 0.0, duration: 7.0, intensity: 0.5, speed: 1.0 },
-        outAnimation: { type: 'fadeOut' as const, start: 6.4, duration: 0.6, easing: 'linear' as const },
+        inAnimation: { type: 'fadeIn' as const, start: 0.0, duration: 1.3, easing: 'easeOutExpo' as const },
+        loopAnimation: { type: 'slowZoom' as const, start: 0.0, duration: 7.0, intensity: 0.4, speed: 0.6 },
+        outAnimation: { type: 'fadeOut' as const, start: 6.2, duration: 0.8, easing: 'easeInOutSine' as const },
         effects: [],
       };
     case 'hero':
       return {
-        inAnimation: { type: 'scaleFade' as const, start: 0.1, duration: 0.85, easing: 'easeOutBack' as const },
-        loopAnimation: { type: 'loopPulse' as const, start: 1.0, duration: 6.0, intensity: 1.1, speed: 1.0 },
-        outAnimation: { type: 'scaleOut' as const, start: 6.2, duration: 0.8, easing: 'easeInBack' as const },
-        effects: [
-          {
-            id: `eff_neon_${Date.now()}`,
-            type: 'glowNeon' as const,
-            enabled: true,
-            start: 0.0,
-            duration: 7.0,
-            intensity: 1.0,
-            color: '#00f0ff',
-          },
-        ],
+        inAnimation: { type: 'smoothSlideUp' as const, start: 0.35, duration: 1.25, easing: 'easeOutExpo' as const },
+        loopAnimation: { type: 'softFloat' as const, start: 1.6, duration: 5.4, intensity: 0.7, speed: 0.75 },
+        outAnimation: { type: 'smoothFadeOut' as const, start: 6.2, duration: 0.8, easing: 'easeInOutSine' as const },
+        effects: [],
       };
     case 'title':
       return {
-        inAnimation: { type: 'slideDownFade' as const, start: 0.35, duration: 0.75, easing: 'easeOutBack' as const },
-        loopAnimation: { type: 'slowZoom' as const, start: 1.2, duration: 5.8, intensity: 0.5, speed: 1.0 },
-        outAnimation: { type: 'neonOut' as const, start: 6.2, duration: 0.8, easing: 'easeInBack' as const },
-        effects: [
-          {
-            id: `eff_title_glow_${Date.now()}`,
-            type: 'glowNeon' as const,
-            enabled: true,
-            start: 0.4,
-            duration: 6.6,
-            intensity: 1.1,
-            color: '#f72585',
-          },
-        ],
+        inAnimation: { type: 'smoothSlideUp' as const, start: 0.75, duration: 1.2, easing: 'easeOutExpo' as const },
+        loopAnimation: { type: 'slowZoom' as const, start: 1.95, duration: 5.0, intensity: 0.4, speed: 0.6 },
+        outAnimation: { type: 'fadeOut' as const, start: 6.2, duration: 0.8, easing: 'easeInOutSine' as const },
+        effects: [],
       };
     case 'date':
       return {
-        inAnimation: { type: 'slideDownFade' as const, start: 0.55, duration: 0.7, easing: 'easeOutBack' as const },
+        inAnimation: { type: 'smoothSlideUp' as const, start: 1.1, duration: 1.1, easing: 'easeOutExpo' as const },
         loopAnimation: { type: 'none' as const, start: 0, duration: 7, intensity: 1, speed: 1 },
-        outAnimation: { type: 'slideOut' as const, start: 6.2, duration: 0.8, easing: 'easeInQuad' as const },
+        outAnimation: { type: 'smoothFadeOut' as const, start: 6.2, duration: 0.8, easing: 'easeInOutSine' as const },
         effects: [],
       };
     case 'lineup':
       return {
-        inAnimation: { type: 'slideUpFade' as const, start: 0.8 + (index % 3) * 0.18, duration: 0.75, easing: 'easeOutExpo' as const },
+        inAnimation: { type: 'smoothSlideUp' as const, start: 1.4 + (index % 4) * 0.25, duration: 1.1, easing: 'easeOutExpo' as const },
         loopAnimation: { type: 'none' as const, start: 0, duration: 7, intensity: 1, speed: 1 },
-        outAnimation: { type: 'fadeOut' as const, start: 6.2, duration: 0.8, easing: 'linear' as const },
+        outAnimation: { type: 'smoothFadeOut' as const, start: 6.2, duration: 0.8, easing: 'easeInOutSine' as const },
         effects: [],
       };
     case 'cta':
       return {
-        inAnimation: { type: 'pop' as const, start: 1.3, duration: 0.7, easing: 'easeOutBack' as const },
-        loopAnimation: { type: 'loopPulse' as const, start: 2.0, duration: 5.0, intensity: 1.3, speed: 1.2 },
-        outAnimation: { type: 'scaleOut' as const, start: 6.3, duration: 0.7, easing: 'easeInBack' as const },
-        effects: [
-          {
-            id: `eff_cta_sweep_${Date.now()}`,
-            type: 'lightSweep' as const,
-            enabled: true,
-            start: 2.2,
-            duration: 1.0,
-            intensity: 1.0,
-          },
-        ],
+        inAnimation: { type: 'softScale' as const, start: 1.85, duration: 1.1, easing: 'easeOutBack' as const },
+        loopAnimation: { type: 'breathing' as const, start: 2.95, duration: 4.0, intensity: 0.6, speed: 0.8 },
+        outAnimation: { type: 'smoothFadeOut' as const, start: 6.2, duration: 0.8, easing: 'easeInOutSine' as const },
+        effects: [],
       };
     case 'logo':
       return {
-        inAnimation: { type: 'zoomBurst' as const, start: 0.2, duration: 0.75, easing: 'easeOutExpo' as const },
+        inAnimation: { type: 'smoothSlideDown' as const, start: 0.3, duration: 1.2, easing: 'easeOutExpo' as const },
         loopAnimation: { type: 'none' as const, start: 0, duration: 7, intensity: 1, speed: 1 },
-        outAnimation: { type: 'fadeOut' as const, start: 6.3, duration: 0.7, easing: 'linear' as const },
+        outAnimation: { type: 'smoothFadeOut' as const, start: 6.2, duration: 0.8, easing: 'easeInOutSine' as const },
         effects: [],
       };
     case 'fx':
       return {
-        inAnimation: { type: 'strobeIn' as const, start: 0.15, duration: 0.65, easing: 'easeOutQuad' as const },
+        inAnimation: { type: 'fadeIn' as const, start: 0.5, duration: 1.2, easing: 'easeOutExpo' as const },
         loopAnimation: { type: 'none' as const, start: 0, duration: 7, intensity: 1, speed: 1 },
-        outAnimation: { type: 'fadeOut' as const, start: 6.2, duration: 0.8, easing: 'linear' as const },
+        outAnimation: { type: 'fadeOut' as const, start: 6.2, duration: 0.8, easing: 'easeInOutSine' as const },
         effects: [],
       };
     default: {
-      const staggeredStart = 0.2 + (index % 5) * 0.22;
-      const y = normY ?? 960;
-      const x = normX ?? 540;
-
-      // Select dynamic motion entrance based on screen placement
-      let inType: 'slideDownFade' | 'slideUpFade' | 'slideLeft' | 'slideRight' | 'pop' | 'scaleFade' = 'pop';
-      if (y < 700) {
-        inType = 'slideDownFade';
-      } else if (y > 1200) {
-        inType = 'slideUpFade';
-      } else if (x < 300) {
-        inType = 'slideRight';
-      } else if (x > 780) {
-        inType = 'slideLeft';
-      } else {
-        inType = index % 2 === 0 ? 'scaleFade' : 'pop';
-      }
-
+      const staggeredStart = 0.4 + (index % 6) * 0.28;
       return {
-        inAnimation: { type: inType, start: staggeredStart, duration: 0.75, easing: 'easeOutBack' as const },
+        inAnimation: { type: 'smoothSlideUp' as const, start: staggeredStart, duration: 1.15, easing: 'easeOutExpo' as const },
         loopAnimation: { type: 'none' as const, start: 0, duration: 7, intensity: 1, speed: 1 },
-        outAnimation: { type: 'fadeOut' as const, start: 6.3, duration: 0.7, easing: 'linear' as const },
+        outAnimation: { type: 'smoothFadeOut' as const, start: 6.2, duration: 0.8, easing: 'easeInOutSine' as const },
         effects: [],
       };
     }
@@ -318,7 +272,7 @@ export async function parsePsdFile(file: File): Promise<SceneProject> {
 
     const role = detectLayerRole(layerName, normY, normW, normH);
     const blendMode = mapPsdBlendMode(node.blendMode);
-    const animDefaults = getDefaultAnimationsForRole(role, sceneLayers.length, normY, normX);
+    const animDefaults = getDefaultAnimationsForRole(role, sceneLayers.length);
 
     const layer: SceneLayer = {
       id: `psd_layer_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,

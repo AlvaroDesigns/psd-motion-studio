@@ -193,6 +193,38 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
                 📄 Multiplicar
               </button>
             </div>
+
+            {layer.effects.some((e) => e.type === 'glowNeon' && e.enabled) && (
+              <div style={{ marginTop: 8 }}>
+                <button
+                  type="button"
+                  style={{
+                    width: '100%',
+                    padding: '6px 10px',
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    borderRadius: 6,
+                    color: '#fca5a5',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 6,
+                  }}
+                  onClick={() => {
+                    onUpdateLayer({
+                      ...layer,
+                      effects: layer.effects.filter((e) => e.type !== 'glowNeon'),
+                    });
+                  }}
+                  title="Eliminar trazo o halo de neón de esta capa"
+                >
+                  🚫 Quitar Trazo / Brillo de Color
+                </button>
+              </div>
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 4 }}>
@@ -372,7 +404,7 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
                   <input
                     type="range"
                     min="0.1"
-                    max="3.0"
+                    max="4.0"
                     step="0.05"
                     className="am-slider"
                     value={layer.inAnimation.duration}
@@ -383,6 +415,76 @@ export const LayerInspector: React.FC<LayerInspectorProps> = ({
                       })
                     }
                   />
+
+                  {/* Timing Preset Chips */}
+                  <div style={{ display: 'flex', gap: 6, marginTop: 6, marginBottom: 4 }}>
+                    <button
+                      type="button"
+                      style={{
+                        flex: 1,
+                        fontSize: 10,
+                        padding: '4px 6px',
+                        background: layer.inAnimation.duration >= 1.35 ? 'rgba(35, 200, 60, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                        border: layer.inAnimation.duration >= 1.35 ? '1px solid #23c83c' : '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: 4,
+                        color: layer.inAnimation.duration >= 1.35 ? '#23c83c' : 'var(--am-text-dim)',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() =>
+                        onUpdateLayer({
+                          ...layer,
+                          inAnimation: { ...layer.inAnimation, duration: 1.5, easing: 'easeOutExpo' },
+                        })
+                      }
+                      title="Entrada pausada y cinematográfica"
+                    >
+                      🌊 Suave (1.5s)
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        flex: 1,
+                        fontSize: 10,
+                        padding: '4px 6px',
+                        background: layer.inAnimation.duration >= 1.0 && layer.inAnimation.duration < 1.35 ? 'rgba(59, 130, 246, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                        border: layer.inAnimation.duration >= 1.0 && layer.inAnimation.duration < 1.35 ? '1px solid #3b82f6' : '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: 4,
+                        color: layer.inAnimation.duration >= 1.0 && layer.inAnimation.duration < 1.35 ? '#60a5fa' : 'var(--am-text-dim)',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() =>
+                        onUpdateLayer({
+                          ...layer,
+                          inAnimation: { ...layer.inAnimation, duration: 1.15, easing: 'easeOutExpo' },
+                        })
+                      }
+                      title="Entrada armónica y fluida"
+                    >
+                      ✨ Equilibrado (1.15s)
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        flex: 1,
+                        fontSize: 10,
+                        padding: '4px 6px',
+                        background: layer.inAnimation.duration < 1.0 ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.05)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        borderRadius: 4,
+                        color: 'var(--am-text-dim)',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() =>
+                        onUpdateLayer({
+                          ...layer,
+                          inAnimation: { ...layer.inAnimation, duration: 0.75, easing: 'easeOutExpo' },
+                        })
+                      }
+                      title="Entrada rápida"
+                    >
+                      ⚡ Rápido (0.75s)
+                    </button>
+                  </div>
                 </div>
 
                 <div className="am-field-group">

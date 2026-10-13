@@ -205,82 +205,81 @@ export function computeLayerState(
 
     switch (inAnim.type) {
       case "smoothSlideUp":
-        translateY = (1 - inProgress) * 200;
-        opacity *= Math.min(1, inProgress * 3);
+        translateY = (1 - inProgress) * 90;
+        opacity *= Math.min(1, inProgress * 1.4);
         break;
       case "smoothSlideDown":
-        translateY = (1 - inProgress) * -200;
-        opacity *= Math.min(1, inProgress * 3);
+        translateY = (1 - inProgress) * -90;
+        opacity *= Math.min(1, inProgress * 1.4);
         break;
       case "smoothDrift":
-        translateX = (1 - inProgress) * 120;
-        translateY = (1 - inProgress) * 80;
-        opacity *= Math.min(1, inProgress * 2.5);
+        translateX = (1 - inProgress) * 70;
+        translateY = (1 - inProgress) * 45;
+        opacity *= Math.min(1, inProgress * 1.4);
         break;
       case "softScale":
-        scaleX = 0.5 + 0.5 * inProgress;
+        scaleX = 0.88 + 0.12 * inProgress;
         scaleY = scaleX;
-        opacity *= Math.min(1, inProgress * 3);
+        opacity *= Math.min(1, inProgress * 1.5);
         break;
       case "fadeIn":
         opacity *= inProgress;
         break;
       case "slideDownFade":
-        translateY = (1 - inProgress) * -450;
-        opacity *= Math.min(1, inProgress * 3.5);
+        translateY = (1 - inProgress) * -130;
+        opacity *= Math.min(1, inProgress * 1.5);
         break;
       case "slideUpFade":
-        translateY = (1 - inProgress) * 450;
-        opacity *= Math.min(1, inProgress * 3.5);
+        translateY = (1 - inProgress) * 130;
+        opacity *= Math.min(1, inProgress * 1.5);
         break;
       case "slideLeft":
-        translateX = (1 - inProgress) * 600;
-        opacity *= Math.min(1, inProgress * 4);
+        translateX = (1 - inProgress) * 150;
+        opacity *= Math.min(1, inProgress * 1.5);
         break;
       case "slideRight":
-        translateX = (1 - inProgress) * -600;
-        opacity *= Math.min(1, inProgress * 4);
+        translateX = (1 - inProgress) * -150;
+        opacity *= Math.min(1, inProgress * 1.5);
         break;
       case "scaleFade":
-        scaleX = 0.2 + 0.8 * inProgress;
+        scaleX = 0.82 + 0.18 * inProgress;
         scaleY = scaleX;
-        opacity *= Math.min(1, inProgress * 4);
+        opacity *= Math.min(1, inProgress * 1.5);
         break;
       case "pop":
-        scaleX = inProgress;
-        scaleY = inProgress;
-        opacity *= Math.min(1, inProgress * 5);
-        break;
-      case "neonReveal":
         scaleX = 0.85 + 0.15 * inProgress;
         scaleY = scaleX;
-        opacity *= inProgress < 0.45 ? (Math.sin(time * 35) > 0 ? 0.9 : 0.2) : 1;
+        opacity *= Math.min(1, inProgress * 1.5);
+        break;
+      case "neonReveal":
+        scaleX = 0.9 + 0.1 * inProgress;
+        scaleY = scaleX;
+        opacity *= inProgress;
         break;
       case "glitchIn":
-        opacity *= Math.min(1, inProgress * 3);
-        if (inProgress < 0.8) {
-          translateX =
-            (Math.sin(time * 60) > 0 ? 1 : -1) * (1 - inProgress) * 60;
+        opacity *= Math.min(1, inProgress * 1.5);
+        if (inProgress < 0.75) {
+          translateX = (Math.sin(time * 35) > 0 ? 1 : -1) * (1 - inProgress) * 25;
         }
         break;
       case "zoomBurst":
-        scaleX = 2.6 - 1.6 * inProgress;
+        scaleX = 1.35 - 0.35 * inProgress;
         scaleY = scaleX;
-        opacity *= Math.min(1, inProgress * 3.5);
+        opacity *= Math.min(1, inProgress * 1.5);
         break;
       case "bassDropIn":
-        translateY = (1 - inProgress) * -650;
-        opacity *= Math.min(1, inProgress * 4);
+        translateY = (1 - inProgress) * -160;
+        opacity *= Math.min(1, inProgress * 1.5);
         if (inProgress > 0.8) {
-          translateY += Math.sin((inProgress - 0.8) * Math.PI * 10) * 18 * (1 - inProgress);
+          translateY += Math.sin((inProgress - 0.8) * Math.PI * 6) * 10 * (1 - inProgress);
         }
         break;
       case "strobeIn":
-        opacity *= inProgress > 0.85 ? 1 : (Math.floor(time * 24) % 2 === 0 ? 1 : 0.05);
+        opacity *= inProgress;
         break;
       case "whipPan":
-        translateX = (1 - inProgress) * -800;
-        opacity *= Math.min(1, inProgress * 5);
+        translateX = (1 - inProgress) * -220;
+        opacity *= Math.min(1, inProgress * 1.5);
         break;
     }
   }

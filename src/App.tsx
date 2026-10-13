@@ -23,6 +23,7 @@ import {
   Film,
   Music,
   FolderTree,
+  FolderOpen,
   Share2,
   Play,
 } from 'lucide-react';
@@ -103,15 +104,6 @@ export function App() {
         })),
       },
     ],
-    []
-  );
-
-  const demoDropdownOptions = useMemo(
-    () =>
-      SAMPLE_PROJECTS_LIST.map((demo) => ({
-        value: demo.id,
-        label: demo.name,
-      })),
     []
   );
 
@@ -211,9 +203,16 @@ export function App() {
 
     setProject((prev) => {
       const baseLayers = prev.layers.length > 0 ? prev.layers : createMoventBrandProject().layers;
+      const isNeonTemplate = template.category === 'neon' || template.id.startsWith('neon_');
+      const cleanBase = isNeonTemplate
+        ? baseLayers
+        : baseLayers.map((l) => ({
+            ...l,
+            effects: l.effects.filter((e) => e.type !== 'glowNeon'),
+          }));
       return {
         ...prev,
-        layers: template.apply(baseLayers, prev.settings.duration),
+        layers: template.apply(cleanBase, prev.settings.duration),
       };
     });
 
@@ -372,14 +371,23 @@ export function App() {
             width={260}
           />
 
-          {/* DEMO SELECTOR CUSTOM DROPDOWN */}
-          <CustomDropdown
-            value=""
-            placeholder="📁 Cargar Demo..."
-            options={demoDropdownOptions}
-            onChange={(val) => handleLoadDemoProject(val)}
-            width={145}
-          />
+          {/* BOTÓN DEMO ÚNICO */}
+          <button
+            className="am-tool-btn"
+            onClick={() => handleLoadDemoProject('movent_brand')}
+            title="Cargar Proyecto Demo (Movent Brand)"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              padding: '0 10px',
+              height: 28,
+              fontSize: 11,
+              borderRadius: 'var(--radius-pill)',
+            }}
+          >
+            <FolderOpen size={13} /> Demo
+          </button>
 
           <button className="am-btn-ai" onClick={() => setIsAIModalOpen(true)}>
             <Sparkles size={13} /> IA

@@ -284,6 +284,27 @@ export const Timeline: React.FC<TimelineProps> = ({
     }
   };
 
+  const handleSmoothAllEntrances = () => {
+    project.layers.forEach((layer, idx) => {
+      const isBg = layer.role === "background" || layer.name.toLowerCase().includes("bg");
+      const stagger = isBg ? 0 : 0.35 + (idx - 1) * 0.28;
+      const duration = isBg ? 1.4 : 1.3;
+      onUpdateLayer({
+        ...layer,
+        inAnimation: {
+          ...layer.inAnimation,
+          start: Number(stagger.toFixed(2)),
+          duration: Number(duration.toFixed(2)),
+          easing: "easeOutExpo",
+        },
+        loopAnimation: {
+          ...layer.loopAnimation,
+          start: Number((stagger + duration).toFixed(2)),
+        },
+      });
+    });
+  };
+
   return (
     <div className="am-timeline-container">
       {/* TIMELINE TOOLBAR (Functional Tracks vs Keyframes switcher) */}
@@ -310,6 +331,26 @@ export const Timeline: React.FC<TimelineProps> = ({
               Keyframes (Curvas)
             </button>
           </div>
+
+          {/* Smooth Entrances Button */}
+          <button
+            className="am-tool-btn"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              padding: "2px 8px",
+              fontSize: 10,
+              background: "rgba(35, 200, 60, 0.12)",
+              border: "1px solid rgba(35, 200, 60, 0.35)",
+              color: "#23c83c",
+              borderRadius: 4,
+            }}
+            onClick={handleSmoothAllEntrances}
+            title="Ajusta todas las capas para una entrada pausada (1.3s), armónica y suave"
+          >
+            🌊 Suavizar Entradas (1.3s)
+          </button>
 
           {timelineView === "keyframes" && (
             <button
