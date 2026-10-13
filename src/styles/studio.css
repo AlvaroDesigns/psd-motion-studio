@@ -798,6 +798,21 @@ body {
   padding: 4px 0;
 }
 
+/* Custom Dropdown scrollbar & animation */
+.am-custom-dropdown div[role="listbox"]::-webkit-scrollbar {
+  width: 6px;
+}
+.am-custom-dropdown div[role="listbox"]::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+.am-custom-dropdown div[role="listbox"]::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+.am-custom-dropdown div[role="listbox"]::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
 /* Apple Motion Slider */
 .am-slider {
   width: 100%;

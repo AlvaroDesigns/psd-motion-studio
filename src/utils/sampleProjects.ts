@@ -1340,3 +1340,445 @@ export function createMoventBrandProject(): SceneProject {
     layers,
   };
 }
+
+// ============================================================
+// --- MOTIONDESIGNART DEMO FLYER CREATORS ---
+// ============================================================
+
+/**
+ * Afro@Live — Afrobeat & Amapiano Motion Flyer
+ */
+export function createAfroLiveProject(): SceneProject {
+  const W = 1080;
+  const H = 1920;
+
+  const bgCanvas = createGraphicCanvas(W, H, (ctx, w, h) => {
+    const bgGrad = ctx.createRadialGradient(w / 2, h * 0.45, 120, w / 2, h / 2, h * 0.85);
+    bgGrad.addColorStop(0, '#2b1400');
+    bgGrad.addColorStop(0.45, '#140800');
+    bgGrad.addColorStop(1, '#050200');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Warm sun rays
+    ctx.save();
+    ctx.globalAlpha = 0.15;
+    ctx.strokeStyle = '#ffaa00';
+    ctx.lineWidth = 90;
+    ctx.beginPath();
+    ctx.moveTo(w / 2, 0);
+    ctx.lineTo(-200, h);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#ff6b00';
+    ctx.lineWidth = 110;
+    ctx.beginPath();
+    ctx.moveTo(w / 2, 0);
+    ctx.lineTo(w + 200, h);
+    ctx.stroke();
+    ctx.restore();
+
+    // Floating gold sparks
+    ctx.fillStyle = '#ffda79';
+    for (let i = 0; i < 70; i++) {
+      const px = (i * 157) % w;
+      const py = (i * 289) % h;
+      const pr = (i % 3) + 1.5;
+      ctx.globalAlpha = 0.2 + (i % 4) * 0.15;
+      ctx.beginPath();
+      ctx.arc(px, py, pr, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+
+  const sunCrestCanvas = createGraphicCanvas(700, 700, (ctx, w, h) => {
+    const cx = w / 2;
+    const cy = h / 2;
+    ctx.save();
+    ctx.strokeStyle = '#ffaa00';
+    ctx.shadowColor = '#ffaa00';
+    ctx.shadowBlur = 35;
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 240, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Inner tribal dashed ring
+    ctx.setLineDash([20, 15]);
+    ctx.strokeStyle = '#ff6b00';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 200, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Golden sun core
+    const coreGrad = ctx.createRadialGradient(cx, cy, 30, cx, cy, 150);
+    coreGrad.addColorStop(0, '#fff4cc');
+    coreGrad.addColorStop(0.5, '#ffaa00');
+    coreGrad.addColorStop(1, '#b35900');
+    ctx.fillStyle = coreGrad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 140, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  });
+
+  const titleCanvas = createGraphicCanvas(980, 260, (ctx, w, _h) => {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.font = '800 30px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#ffaa00';
+    ctx.letterSpacing = '8px';
+    ctx.fillText('AFROBEATS & AMAPIANO VIBES', w / 2, 50);
+
+    ctx.font = '900 130px "Outfit", sans-serif';
+    const grad = ctx.createLinearGradient(100, 70, w - 100, 220);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(0.5, '#ffaa00');
+    grad.addColorStop(1, '#ff5500');
+    ctx.fillStyle = grad;
+    ctx.shadowColor = '#ffaa00';
+    ctx.shadowBlur = 30;
+    ctx.fillText('AFRO@LIVE', w / 2, 185);
+    ctx.restore();
+  });
+
+  const lineupCanvas = createGraphicCanvas(920, 150, (ctx, w, _h) => {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.font = '700 32px "Outfit", sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(255, 170, 0, 0.5)';
+    ctx.shadowBlur = 10;
+    ctx.fillText('BURNA BOY  •  REMA  •  ASAKE  •  AYRA STARR', w / 2, 50);
+
+    ctx.font = '600 24px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#ffda79';
+    ctx.fillText('DJ TUNEZ  •  MAJOR LEAGUE DJZ  •  UNCLE WAFFLES', w / 2, 105);
+    ctx.restore();
+  });
+
+  const dateCanvas = createGraphicCanvas(750, 110, (ctx, w, h) => {
+    ctx.save();
+    ctx.fillStyle = 'rgba(255, 170, 0, 0.12)';
+    ctx.strokeStyle = 'rgba(255, 170, 0, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.shadowColor = 'rgba(255, 170, 0, 0.4)';
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.roundRect(30, 10, w - 60, h - 20, (h - 20) / 2);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.font = '700 32px "Outfit", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText('⚡ SÁBADO 18 OCTUBRE • LIVE ARENA ⚡', w / 2, h / 2);
+    ctx.restore();
+  });
+
+  const ctaCanvas = createGraphicCanvas(600, 110, (ctx, w, h) => {
+    ctx.save();
+    const grad = ctx.createLinearGradient(50, 0, w - 50, 0);
+    grad.addColorStop(0, '#ffaa00');
+    grad.addColorStop(1, '#ff5500');
+    ctx.fillStyle = grad;
+    ctx.shadowColor = 'rgba(255, 85, 0, 0.7)';
+    ctx.shadowBlur = 20;
+    ctx.beginPath();
+    ctx.roundRect(50, 12, w - 100, h - 24, (h - 24) / 2);
+    ctx.fill();
+
+    ctx.font = '800 30px "Outfit", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#060200';
+    ctx.fillText('GET TICKETS NOW →', w / 2, h / 2);
+    ctx.restore();
+  });
+
+  return {
+    settings: {
+      name: 'Afro@Live — Motion Flyer (MotionDesignArt)',
+      width: W,
+      height: H,
+      duration: 7.0,
+      fps: 30,
+      backgroundColor: '#0a0400',
+    },
+    layers: [
+      {
+        id: 'layer_afro_bg',
+        name: 'Background Golden Dusk',
+        role: 'background',
+        visible: true,
+        locked: false,
+        opacity: 1,
+        blendMode: 'source-over',
+        x: 0,
+        y: 0,
+        width: W,
+        height: H,
+        canvas: bgCanvas,
+        inAnimation: { type: 'fadeIn', start: 0, duration: 1.0, easing: 'easeOutExpo' },
+        loopAnimation: { type: 'gentleDrift', start: 1.0, duration: 5.2, intensity: 0.5, speed: 0.6 },
+        outAnimation: { type: 'smoothFadeOut', start: 6.2, duration: 0.8, easing: 'easeInOutSine' },
+        effects: [],
+      },
+      {
+        id: 'layer_afro_sun',
+        name: 'Tribal Sun Crest',
+        role: 'hero',
+        visible: true,
+        locked: false,
+        opacity: 1,
+        blendMode: 'screen',
+        x: (W - 700) / 2,
+        y: 370,
+        width: 700,
+        height: 700,
+        canvas: sunCrestCanvas,
+        inAnimation: { type: 'softScale', start: 0.2, duration: 0.9, easing: 'easeOutExpo' },
+        loopAnimation: { type: 'loopPulse', start: 1.1, duration: 5.1, intensity: 1.3, speed: 1.0 },
+        outAnimation: { type: 'smoothFadeOut', start: 6.2, duration: 0.8, easing: 'easeInOutSine' },
+        effects: [
+          { id: 'eff_gold_' + Date.now(), type: 'glowNeon', enabled: true, start: 0.2, duration: 6.5, intensity: 1.6, color: '#ffaa00' },
+          { id: 'eff_sweep_' + Date.now(), type: 'lightSweep', enabled: true, start: 1.8, duration: 1.4, intensity: 1.2 },
+        ],
+      },
+      {
+        id: 'layer_afro_title',
+        name: 'AFRO@LIVE Kinetic Title',
+        role: 'title',
+        visible: true,
+        locked: false,
+        opacity: 1,
+        blendMode: 'source-over',
+        x: (W - 980) / 2,
+        y: 970,
+        width: 980,
+        height: 260,
+        canvas: titleCanvas,
+        inAnimation: { type: 'smoothSlideUp', start: 0.4, duration: 0.8, easing: 'easeOutExpo' },
+        loopAnimation: { type: 'softFloat', start: 1.2, duration: 5.0, intensity: 0.8, speed: 0.9 },
+        outAnimation: { type: 'smoothFadeOut', start: 6.2, duration: 0.8, easing: 'easeInOutSine' },
+        effects: [
+          { id: 'eff_tsweep_' + Date.now(), type: 'lightSweep', enabled: true, start: 2.2, duration: 1.2, intensity: 1.1 },
+        ],
+      },
+      {
+        id: 'layer_afro_lineup',
+        name: 'Headliners Lineup',
+        role: 'lineup',
+        visible: true,
+        locked: false,
+        opacity: 1,
+        blendMode: 'source-over',
+        x: (W - 920) / 2,
+        y: 1280,
+        width: 920,
+        height: 150,
+        canvas: lineupCanvas,
+        inAnimation: { type: 'pop', start: 0.6, duration: 0.7, easing: 'easeOutBack' },
+        loopAnimation: { type: 'pendulumSwing', start: 1.3, duration: 4.9, intensity: 0.7, speed: 0.8 },
+        outAnimation: { type: 'smoothFadeOut', start: 6.2, duration: 0.8, easing: 'easeInOutSine' },
+        effects: [],
+      },
+      {
+        id: 'layer_afro_date',
+        name: 'Date Pill Badge',
+        role: 'date',
+        visible: true,
+        locked: false,
+        opacity: 1,
+        blendMode: 'source-over',
+        x: (W - 750) / 2,
+        y: 1490,
+        width: 750,
+        height: 110,
+        canvas: dateCanvas,
+        inAnimation: { type: 'smoothSlideUp', start: 0.8, duration: 0.7, easing: 'easeOutExpo' },
+        loopAnimation: { type: 'breathing', start: 1.5, duration: 4.7, intensity: 0.6, speed: 0.9 },
+        outAnimation: { type: 'smoothFadeOut', start: 6.2, duration: 0.8, easing: 'easeInOutSine' },
+        effects: [],
+      },
+      {
+        id: 'layer_afro_cta',
+        name: 'CTA Tickets Pill',
+        role: 'cta',
+        visible: true,
+        locked: false,
+        opacity: 1,
+        blendMode: 'source-over',
+        x: (W - 600) / 2,
+        y: 1650,
+        width: 600,
+        height: 110,
+        canvas: ctaCanvas,
+        inAnimation: { type: 'zoomBurst', start: 1.0, duration: 0.7, easing: 'elasticOut' },
+        loopAnimation: { type: 'loopPulse', start: 1.7, duration: 4.5, intensity: 1.3, speed: 1.1 },
+        outAnimation: { type: 'scaleOut', start: 6.2, duration: 0.8, easing: 'easeInOutSine' },
+        effects: [],
+      },
+    ],
+  };
+}
+
+/**
+ * Fiesta Latina — Urban Reggaeton Dembow Festival
+ */
+export function createFiestaLatinaProject(): SceneProject {
+  const W = 1080;
+  const H = 1920;
+
+  const bgCanvas = createGraphicCanvas(W, H, (ctx, w, h) => {
+    const bgGrad = ctx.createRadialGradient(w / 2, h * 0.45, 100, w / 2, h / 2, h * 0.85);
+    bgGrad.addColorStop(0, '#2b001a');
+    bgGrad.addColorStop(0.45, '#12000d');
+    bgGrad.addColorStop(1, '#050004');
+    ctx.fillStyle = bgGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Neon beams
+    ctx.save();
+    ctx.globalAlpha = 0.2;
+    ctx.strokeStyle = '#ff0055';
+    ctx.lineWidth = 120;
+    ctx.beginPath();
+    ctx.moveTo(-100, 200);
+    ctx.lineTo(w + 200, h + 200);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#ffb703';
+    ctx.lineWidth = 90;
+    ctx.beginPath();
+    ctx.moveTo(w + 100, 200);
+    ctx.lineTo(-200, h + 200);
+    ctx.stroke();
+    ctx.restore();
+  });
+
+  const titleCanvas = createGraphicCanvas(980, 280, (ctx, w, _h) => {
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.font = '900 32px "Plus Jakarta Sans", sans-serif';
+    ctx.fillStyle = '#ffb703';
+    ctx.letterSpacing = '8px';
+    ctx.fillText('EL FESTIVAL MÁS GRANDE DE REGGAETON', w / 2, 50);
+
+    ctx.font = '900 135px "Outfit", sans-serif';
+    const grad = ctx.createLinearGradient(100, 80, w - 100, 240);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(0.5, '#ff0055');
+    grad.addColorStop(1, '#ffb703');
+    ctx.fillStyle = grad;
+    ctx.shadowColor = '#ff0055';
+    ctx.shadowBlur = 35;
+    ctx.fillText('FIESTA LATINA', w / 2, 200);
+    ctx.restore();
+  });
+
+  return {
+    settings: {
+      name: 'Fiesta Latina — Motion Flyer (MotionDesignArt)',
+      width: W,
+      height: H,
+      duration: 7.0,
+      fps: 30,
+      backgroundColor: '#0a0005',
+    },
+    layers: [
+      {
+        id: 'layer_fiesta_bg',
+        name: 'Background Neon Night',
+        role: 'background',
+        visible: true,
+        locked: false,
+        opacity: 1,
+        blendMode: 'source-over',
+        x: 0,
+        y: 0,
+        width: W,
+        height: H,
+        canvas: bgCanvas,
+        inAnimation: { type: 'fadeIn', start: 0, duration: 0.8, easing: 'easeOutExpo' },
+        loopAnimation: { type: 'slowZoom', start: 0.8, duration: 5.4, intensity: 0.5, speed: 0.7 },
+        outAnimation: { type: 'smoothFadeOut', start: 6.2, duration: 0.8, easing: 'easeInOutSine' },
+        effects: [],
+      },
+      {
+        id: 'layer_fiesta_title',
+        name: 'FIESTA LATINA Title',
+        role: 'hero',
+        visible: true,
+        locked: false,
+        opacity: 1,
+        blendMode: 'source-over',
+        x: (W - 980) / 2,
+        y: 660,
+        width: 980,
+        height: 280,
+        canvas: titleCanvas,
+        inAnimation: { type: 'zoomBurst', start: 0.2, duration: 0.7, easing: 'elasticOut' },
+        loopAnimation: { type: 'loopPulse', start: 0.9, duration: 5.3, intensity: 1.5, speed: 1.2 },
+        outAnimation: { type: 'scaleOut', start: 6.2, duration: 0.8, easing: 'easeInOutSine' },
+        effects: [
+          { id: 'eff_fiesta_' + Date.now(), type: 'glowNeon', enabled: true, start: 0, duration: 7, intensity: 1.8, color: '#ff0055' },
+          { id: 'eff_sweep_' + Date.now(), type: 'lightSweep', enabled: true, start: 1.4, duration: 1.2, intensity: 1.1 },
+        ],
+      },
+    ],
+  };
+}
+
+export interface DemoProjectMeta {
+  id: string;
+  name: string;
+  category: string;
+  description: string;
+  badge: string;
+  color: string;
+  create: () => SceneProject;
+}
+
+export const SAMPLE_PROJECTS_LIST: DemoProjectMeta[] = [
+  {
+    id: 'afro_live',
+    name: '🌴 Afro@Live (MotionDesignArt)',
+    category: 'Afrobeat & Amapiano',
+    description: 'Flyer animado tropical a 112 BPM, resplandor dorado, percusión visual y tipografía cinética con haz de luz.',
+    badge: 'Afrobeat',
+    color: '#ffaa00',
+    create: createAfroLiveProject,
+  },
+  {
+    id: 'fiesta_latina',
+    name: '🔥 Fiesta Latina Dembow Fest',
+    category: 'Latin Urban & Reggaeton',
+    description: 'Alta energía dembow a 98 BPM, neón fucsia/oro, zoom bursts en caídas y pulsos rítmicos.',
+    badge: 'Reggaeton',
+    color: '#ff0055',
+    create: createFiestaLatinaProject,
+  },
+  {
+    id: 'nexus_electronic',
+    name: '⚡ Nexus Electronic Festival (Spec)',
+    category: 'Electronic Music Festival',
+    description: 'Festival EDM futurista en Ibiza con hexágono 3D holográfico, láseres cian/magenta y lineup estelar.',
+    badge: 'Electronic',
+    color: '#00f0ff',
+    create: createElectronicFestivalProject,
+  },
+  {
+    id: 'movent_brand',
+    name: '🎞️ Movent Brand — 2 Diapositivas',
+    category: 'Multi-Slide Brand Story',
+    description: 'Diapositiva 1 (0-2.5s) con revelación de Logo Neón verde #23C83C + Diapositiva 2 con Flyer completo.',
+    badge: '2 Slides',
+    color: '#23C83C',
+    create: createMoventBrandProject,
+  },
+];
+

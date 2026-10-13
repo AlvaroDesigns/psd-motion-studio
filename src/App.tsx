@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { SceneProject, SceneLayer, AIProposal } from './types/scene';
-import { createEmptyProject, createMoventBrandProject } from './utils/sampleProjects';
+import { createEmptyProject, createMoventBrandProject, SAMPLE_PROJECTS_LIST } from './utils/sampleProjects';
 import { MOTION_TEMPLATES } from './utils/animationTemplates';
 import { parsePsdFile } from './utils/psdParser';
 import { StudioViewport } from './components/StudioViewport';
@@ -8,13 +8,14 @@ import { Timeline } from './components/Timeline';
 import { LayerInspector } from './components/LayerInspector';
 import { AIDirectorModal } from './components/AIDirectorModal';
 import { ExportModal } from './components/ExportModal';
+import { TemplatesModal } from './components/TemplatesModal';
+import { CustomDropdown } from './components/CustomDropdown';
 import './styles/studio.css';
 import logoImg from './assets/logo-white.png';
 import {
   Upload,
   Sparkles,
   Layers,
-  FolderOpen,
   Check,
   Lock,
   Unlock,
@@ -51,11 +52,68 @@ export function App() {
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [selectedLayerId, setSelectedLayerId] = useState<string | null>(null);
   const [isAIModalOpen, setIsAIModalOpen] = useState<boolean>(false);
+  const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [leftTab, setLeftTab] = useState<'layers' | 'media' | 'audio'>('layers');
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
   const [activePane, setActivePane] = useState<'project' | 'inspector'>('inspector');
+
+  const templateDropdownGroups = useMemo(
+    () => [
+      {
+        label: '🌴 MOTION FLYERS (MotionDesignArt)',
+        items: MOTION_TEMPLATES.filter((t) => t.category === 'motion_flyers').map((t) => ({
+          value: t.id,
+          label: t.name,
+        })),
+      },
+      {
+        label: '💡 EFECTO NEÓN & CYBER GLOW',
+        items: MOTION_TEMPLATES.filter((t) => NEON_TEMPLATE_IDS.includes(t.id)).map((t) => ({
+          value: t.id,
+          label: t.name,
+        })),
+      },
+      {
+        label: '🎞️ DIAPOSITIVAS (MULTI-ESCENA)',
+        items: MOTION_TEMPLATES.filter((t) => t.id === 'two_slides_neon_flyer').map((t) => ({
+          value: t.id,
+          label: t.name,
+        })),
+      },
+      {
+        label: '⚡ ENERGÍA, FESTIVALES & RAVE (10 Estilos)',
+        items: MOTION_TEMPLATES.filter((t) => FESTIVAL_TEMPLATE_IDS.includes(t.id)).map((t) => ({
+          value: t.id,
+          label: t.name,
+        })),
+      },
+      {
+        label: '🌊 MOVIMIENTOS SUAVES & CINE (8 Estilos)',
+        items: MOTION_TEMPLATES.filter(
+          (t) =>
+            t.id !== 'two_slides_neon_flyer' &&
+            t.category !== 'motion_flyers' &&
+            !NEON_TEMPLATE_IDS.includes(t.id) &&
+            !FESTIVAL_TEMPLATE_IDS.includes(t.id)
+        ).map((t) => ({
+          value: t.id,
+          label: t.name,
+        })),
+      },
+    ],
+    []
+  );
+
+  const demoDropdownOptions = useMemo(
+    () =>
+      SAMPLE_PROJECTS_LIST.map((demo) => ({
+        value: demo.id,
+        label: demo.name,
+      })),
+    []
+  );
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const animFrameRef = useRef<number | null>(null);
@@ -169,6 +227,16 @@ export function App() {
     setIsPlaying(true);
   };
 
+  const handleLoadDemoProject = (demoId: string) => {
+    const demo = SAMPLE_PROJECTS_LIST.find((dp) => dp.id === demoId);
+    if (!demo) return;
+    const newProj = demo.create();
+    setProject(newProj);
+    setSelectedLayerId(newProj.layers[0]?.id || null);
+    setCurrentTime(0);
+    setIsPlaying(true);
+  };
+
   const handleApplyAIProposal = (proposal: AIProposal) => {
     setProject((prev) => {
       const updatedLayers = prev.layers.map((layer) => {
@@ -273,57 +341,45 @@ export function App() {
 
         {/* Center: Animation Templates & Behaviors */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          {/* PLANTILLAS DE ANIMACIÓN DROPDOWN */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ fontSize: 10, fontWeight: 700, color: '#94a3b8', textTransform: 'uppercase' }}>
-              Plantilla:
-            </span>
-            <select
-              id="am-template-select"
-              className="am-select"
-              style={{ width: 275, height: 28, fontSize: 11 }}
-              value={selectedTemplateId}
-              onChange={(e) => handleApplyTemplate(e.target.value)}
-            >
-              <option value="" disabled>Seleccionar Plantilla...</option>
-              <optgroup label="💡 EFECTO NEÓN & CYBER GLOW">
-                {MOTION_TEMPLATES.filter((t) => NEON_TEMPLATE_IDS.includes(t.id)).map((tmpl) => (
-                  <option key={tmpl.id} value={tmpl.id}>
-                    {tmpl.name}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="🎞️ DIAPOSITIVAS (MULTI-ESCENA)">
-                {MOTION_TEMPLATES.filter((t) => t.id === 'two_slides_neon_flyer').map((tmpl) => (
-                  <option key={tmpl.id} value={tmpl.id}>
-                    {tmpl.name}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="⚡ ENERGÍA, FESTIVALES & RAVE (10 Estilos)">
-                {MOTION_TEMPLATES.filter((t) => FESTIVAL_TEMPLATE_IDS.includes(t.id)).map((tmpl) => (
-                  <option key={tmpl.id} value={tmpl.id}>
-                    {tmpl.name}
-                  </option>
-                ))}
-              </optgroup>
-              <optgroup label="🌊 MOVIMIENTOS SUAVES & CINE (8 Estilos)">
-                {MOTION_TEMPLATES.filter((t) => t.id !== 'two_slides_neon_flyer' && !NEON_TEMPLATE_IDS.includes(t.id) && !FESTIVAL_TEMPLATE_IDS.includes(t.id)).map((tmpl) => (
-                  <option key={tmpl.id} value={tmpl.id}>
-                    {tmpl.name}
-                  </option>
-                ))}
-              </optgroup>
-            </select>
-          </div>
-
+          {/* BOTÓN GALERÍA VISUAL DE PLANTILLAS */}
           <button
-            className="am-tool-btn"
-            onClick={() => setProject(createMoventBrandProject())}
-            title="Cargar escena Demo"
+            className="am-btn-ai"
+            style={{
+              background: 'linear-gradient(90deg, rgba(0, 212, 255, 0.22), rgba(255, 107, 0, 0.22))',
+              border: '1px solid rgba(0, 212, 255, 0.45)',
+              color: '#fff',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '0 12px',
+              height: 28,
+              fontSize: 11,
+              fontWeight: 800,
+            }}
+            onClick={() => setIsTemplatesModalOpen(true)}
+            title="Abrir Biblioteca Visual de Plantillas (MotionDesignArt)"
           >
-            <FolderOpen size={12} /> Demo
+            <Sparkles size={13} color="#00d4ff" /> Plantillas
           </button>
+
+          {/* PLANTILLAS DE ANIMACIÓN CUSTOM DROPDOWN */}
+          <CustomDropdown
+            id="am-template-select"
+            value={selectedTemplateId}
+            placeholder="Seleccionar Estilo..."
+            groups={templateDropdownGroups}
+            onChange={(val) => handleApplyTemplate(val)}
+            width={260}
+          />
+
+          {/* DEMO SELECTOR CUSTOM DROPDOWN */}
+          <CustomDropdown
+            value=""
+            placeholder="📁 Cargar Demo..."
+            options={demoDropdownOptions}
+            onChange={(val) => handleLoadDemoProject(val)}
+            width={145}
+          />
 
           <button className="am-btn-ai" onClick={() => setIsAIModalOpen(true)}>
             <Sparkles size={13} /> IA
@@ -497,6 +553,15 @@ export function App() {
         project={project}
         onApplyProposal={handleApplyAIProposal}
         onApplyCustomMix={handleApplyCustomMix}
+      />
+
+      {/* Templates Gallery Modal (MotionDesignArt Collection) */}
+      <TemplatesModal
+        isOpen={isTemplatesModalOpen}
+        onClose={() => setIsTemplatesModalOpen(false)}
+        project={project}
+        onApplyTemplate={handleApplyTemplate}
+        onLoadDemoProject={handleLoadDemoProject}
       />
 
       {/* Video & JSON Export Modal (Fixed UI) */}
