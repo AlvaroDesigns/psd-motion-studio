@@ -598,3 +598,5 @@ export const MOTION_FLYER_TEMPLATES: MotionTemplate[] = [
     },
   },
 ];
+
+export const MOTION_FLYERS_TEMPLATES = MOTION_FLYER_TEMPLATES;

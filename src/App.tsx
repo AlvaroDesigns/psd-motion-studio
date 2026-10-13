@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import type { SceneProject, SceneLayer, AIProposal } from './types/scene';
 import { createEmptyProject, createMoventBrandProject, SAMPLE_PROJECTS_LIST } from './utils/sampleProjects';
-import { MOTION_TEMPLATES } from './utils/animationTemplates';
+import { MOTION_TEMPLATES } from './templates';
 import { parsePsdFile } from './utils/psdParser';
 import { StudioViewport } from './components/StudioViewport';
 import { Timeline } from './components/Timeline';

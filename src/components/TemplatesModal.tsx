@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import type { SceneProject } from '../types/scene';
-import { MOTION_TEMPLATES, type MotionTemplate } from '../utils/animationTemplates';
+import { MOTION_TEMPLATES, type MotionTemplate } from '../templates';
 import { SAMPLE_PROJECTS_LIST } from '../utils/sampleProjects';
 import {
   Wand2,
@@ -47,38 +47,14 @@ export const TemplatesModal: React.FC<TemplatesModalProps> = ({
   const filteredTemplates = useMemo(() => {
     return MOTION_TEMPLATES.filter((template) => {
       // Category filter
-      if (selectedCategory === 'motion_flyers') {
-        if (template.category !== 'motion_flyers') return false;
-      } else if (selectedCategory === 'neon') {
-        if (!template.id.startsWith('neon_')) return false;
-      } else if (selectedCategory === 'festival_rave') {
-        const festIds = [
-          'festival_rave',
-          'techno_warehouse',
-          'bass_drop_strobe',
-          'mainstage_pyro',
-          'psytrance_dimension',
-          'urban_trap_distortion',
-          'sunset_ibiza_melodic',
-          'dynamic_hype',
-          'cyberpunk_glitch',
-          'poster_reveal',
-        ];
-        if (!festIds.includes(template.id)) return false;
-      } else if (selectedCategory === 'smooth_luxury') {
-        const smoothIds = [
-          'smooth_silk_drift',
-          'nordic_keynote',
-          'editorial_fashion',
-          'ambient_cosmic',
-          'breathing_wellness',
-          'kinetic_smooth',
-          'cinema_elegance',
-          'minimal_brand',
-        ];
-        if (!smoothIds.includes(template.id)) return false;
-      } else if (selectedCategory === 'multi_slides') {
-        if (template.id !== 'two_slides_neon_flyer') return false;
+      if (selectedCategory !== 'all') {
+        if (template.category) {
+          if (template.category !== selectedCategory) return false;
+        } else {
+          // Fallback legacy checks
+          if (selectedCategory === 'neon' && !template.id.startsWith('neon_')) return false;
+          if (selectedCategory === 'multi_slides' && template.id !== 'two_slides_neon_flyer') return false;
+        }
       }
 
       // Search query filter
