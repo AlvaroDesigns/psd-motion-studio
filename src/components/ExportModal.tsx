@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import type { SceneProject } from '../types/scene';
 import { computeLayerState, renderLayerToCanvas } from '../engine/motionEngine';
 import { Download, Film, Code, Check, Loader2, X, Play } from 'lucide-react';
@@ -8,16 +8,31 @@ interface ExportModalProps {
   isOpen: boolean;
   onClose: () => void;
   project: SceneProject;
+  /** A new value starts an MP4 render as soon as the export modal opens. */
+  renderRequestId?: number;
 }
 
-export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, project }) => {
+const getFileName = (name: string) => `${name.toLowerCase().trim().replace(/[^a-z0-9]+/gi, '_').replace(/^_|_$/g, '') || 'proyecto'}_1080x1920.mp4`;
+
+export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, project, renderRequestId = 0 }) => {
   const [activeTab, setActiveTab] = useState<'video' | 'json'>('video');
   const [isExporting, setIsExporting] = useState(false);
   const [progress, setProgress] = useState(0);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [jsonCopied, setJsonCopied] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  const videoUrlRef = useRef<string | null>(null);
+  const completedRequestRef = useRef(0);
 
-  if (!isOpen) return null;
+  const clearVideoUrl = useCallback(() => {
+    if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current);
+    videoUrlRef.current = null;
+    setVideoUrl(null);
+  }, []);
+
+  useEffect(() => () => {
+    if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current);
+  }, []);
 
   // Clean serializable Scene JSON (stripping in-memory canvas objects)
   const getCleanSceneJson = () => {
@@ -66,11 +81,21 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
     downloadAnchor.remove();
   };
 
-  // High-fidelity client-side render to MP4
-  const handleRenderVideo = async () => {
+  const downloadVideo = useCallback((url: string) => {
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = getFileName(project.settings.name);
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  }, [project.settings.name]);
+
+  // High-fidelity client-side render to an actual H.264 MP4.
+  const handleRenderVideo = useCallback(async () => {
+    clearVideoUrl();
     setIsExporting(true);
     setProgress(0);
-    setVideoUrl(null);
+    setExportError(null);
 
     const width = project.settings.width;
     const height = project.settings.height;
@@ -83,87 +108,93 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
     offscreen.height = height;
     const ctx = offscreen.getContext('2d');
     if (!ctx) {
+      setExportError('No se pudo crear el lienzo de renderizado.');
       setIsExporting(false);
       return;
     }
 
+    const renderFrame = (frame: number) => {
+      const t = frame / fps;
+      ctx.fillStyle = project.settings.backgroundColor;
+      ctx.fillRect(0, 0, width, height);
+
+      for (const layer of project.layers) {
+        if (!layer.visible) continue;
+        const state = computeLayerState(layer, t, project.settings.duration);
+        renderLayerToCanvas(ctx, layer, state);
+      }
+    };
+
+    const finish = (blob: Blob) => {
+      if (blob.size === 0) throw new Error('El codificador no ha producido datos de vídeo.');
+      const url = URL.createObjectURL(blob);
+      videoUrlRef.current = url;
+      setVideoUrl(url);
+      setProgress(100);
+      setIsExporting(false);
+      // The Export action should result in an MP4 download, without a second click.
+      downloadVideo(url);
+    };
+
     try {
-      // 1. Try modern WebCodecs + mp4-muxer (Native H.264 MP4)
-      if (typeof window !== 'undefined' && typeof window.VideoEncoder !== 'undefined') {
-        const muxer = new Muxer({
-          target: new ArrayBufferTarget(),
-          video: {
-            codec: 'avc',
-            width,
-            height,
-          },
-          fastStart: 'in-memory',
-        });
+      const encoderConfig: VideoEncoderConfig = {
+        codec: 'avc1.4d002a', // H.264 Main Profile, Level 4.2
+        width,
+        height,
+        bitrate: 14_000_000,
+        framerate: fps,
+      };
 
-        const videoEncoder = new VideoEncoder({
-          output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
-          error: (e) => console.error('VideoEncoder error:', e),
-        });
+      // WebCodecs is the reliable path because mp4-muxer receives real H.264 chunks.
+      if (typeof window !== 'undefined' && 'VideoEncoder' in window && 'VideoFrame' in window) {
+        const support = await VideoEncoder.isConfigSupported(encoderConfig);
+        if (support.supported) {
+          const target = new ArrayBufferTarget();
+          const muxer = new Muxer({
+            target,
+            video: { codec: 'avc', width, height },
+            fastStart: 'in-memory',
+          });
 
-        videoEncoder.configure({
-          codec: 'avc1.4d002a', // H.264 Main Profile Level 4.2
-          width,
-          height,
-          bitrate: 14_000_000, // 14 Mbps high bitrate
-          framerate: fps,
-        });
+          const videoEncoder = new VideoEncoder({
+            output: (chunk, meta) => muxer.addVideoChunk(chunk, meta),
+            error: (error) => console.error('VideoEncoder error:', error),
+          });
 
-        for (let frame = 0; frame <= totalFrames; frame++) {
-          const t = frame / fps;
+          videoEncoder.configure(encoderConfig);
 
-          // Clear & render frame
-          ctx.fillStyle = project.settings.backgroundColor;
-          ctx.fillRect(0, 0, width, height);
+          for (let frame = 0; frame < totalFrames; frame++) {
+            renderFrame(frame);
+            const videoFrame = new VideoFrame(offscreen, {
+              timestamp: Math.round((frame / fps) * 1_000_000),
+              duration: Math.round(1_000_000 / fps),
+            });
+            videoEncoder.encode(videoFrame, { keyFrame: frame % (fps * 2) === 0 });
+            videoFrame.close();
 
-          for (const layer of project.layers) {
-            if (!layer.visible) continue;
-            const state = computeLayerState(layer, t, project.settings.duration);
-            renderLayerToCanvas(ctx, layer, state);
+            setProgress(Math.round(((frame + 1) / totalFrames) * 98));
+
+            // Keep the UI responsive while encoding a long project.
+            if (frame % 4 === 0) await new Promise((resolve) => setTimeout(resolve, 0));
           }
 
-          const timestampUs = Math.round((frame / fps) * 1_000_000);
-          const videoFrame = new VideoFrame(offscreen, { timestamp: timestampUs });
-          videoEncoder.encode(videoFrame, { keyFrame: frame % (fps * 2) === 0 });
-          videoFrame.close();
-
-          setProgress(Math.round((frame / totalFrames) * 98));
-
-          // Allow browser UI render cycles
-          if (frame % 4 === 0) {
-            await new Promise((resolve) => setTimeout(resolve, 0));
-          }
+          await videoEncoder.flush();
+          videoEncoder.close();
+          muxer.finalize();
+          finish(new Blob([target.buffer], { type: 'video/mp4' }));
+          return;
         }
-
-        await videoEncoder.flush();
-        muxer.finalize();
-
-        const buffer = muxer.target.buffer;
-        const blob = new Blob([buffer], { type: 'video/mp4' });
-        const url = URL.createObjectURL(blob);
-        setVideoUrl(url);
-        setIsExporting(false);
-        setProgress(100);
-        return;
       }
 
-      // 2. Fallback to MediaRecorder (preferring MP4)
-      const stream = offscreen.captureStream(fps);
-      const mimeTypes = [
-        'video/mp4;codecs=avc1',
-        'video/mp4',
-        'video/webm;codecs=vp9',
-        'video/webm;codecs=vp8',
-        'video/webm',
-      ];
-      const selectedMime = mimeTypes.find((m) => MediaRecorder.isTypeSupported(m)) || 'video/mp4';
+      // Safari can expose an MP4 MediaRecorder even without WebCodecs. Never relabel
+      // WebM as .mp4: that produces files that fail in QuickTime and social apps.
+      if (typeof MediaRecorder === 'undefined' || !MediaRecorder.isTypeSupported('video/mp4')) {
+        throw new Error('Este navegador no puede codificar H.264/MP4. Abre el proyecto en Chrome o Edge actualizado e inténtalo de nuevo.');
+      }
 
+      const stream = offscreen.captureStream(fps);
       const recorder = new MediaRecorder(stream, {
-        mimeType: selectedMime,
+        mimeType: 'video/mp4',
         videoBitsPerSecond: 14000000,
       });
 
@@ -172,39 +203,44 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
         if (e.data.size > 0) chunks.push(e.data);
       };
 
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: selectedMime.includes('mp4') ? 'video/mp4' : selectedMime });
-        const url = URL.createObjectURL(blob);
-        setVideoUrl(url);
-        setIsExporting(false);
-        setProgress(100);
-      };
+      const completed = new Promise<void>((resolve, reject) => {
+        recorder.onstop = () => {
+          try {
+            finish(new Blob(chunks, { type: 'video/mp4' }));
+            resolve();
+          } catch (error) {
+            reject(error);
+          }
+        };
+        recorder.onerror = () => reject(new Error('MediaRecorder no ha podido codificar el MP4.'));
+      });
 
       recorder.start();
-
       const frameInterval = 1000 / fps;
-      for (let frame = 0; frame <= totalFrames; frame++) {
-        const t = frame / fps;
-
-        ctx.fillStyle = project.settings.backgroundColor;
-        ctx.fillRect(0, 0, width, height);
-
-        for (const layer of project.layers) {
-          if (!layer.visible) continue;
-          const state = computeLayerState(layer, t, project.settings.duration);
-          renderLayerToCanvas(ctx, layer, state);
-        }
-
-        setProgress(Math.round((frame / totalFrames) * 100));
-        await new Promise((resolve) => setTimeout(resolve, Math.max(10, frameInterval * 0.4)));
+      const track = stream.getVideoTracks()[0];
+      for (let frame = 0; frame < totalFrames; frame++) {
+        renderFrame(frame);
+        (track as MediaStreamTrack & { requestFrame?: () => void } | undefined)?.requestFrame?.();
+        setProgress(Math.round(((frame + 1) / totalFrames) * 98));
+        await new Promise((resolve) => setTimeout(resolve, frameInterval));
       }
-
       recorder.stop();
+      await completed;
     } catch (err) {
       console.error('Error rendering video:', err);
+      setExportError(err instanceof Error ? err.message : 'No se ha podido renderizar el vídeo MP4.');
       setIsExporting(false);
     }
-  };
+  }, [clearVideoUrl, downloadVideo, project]);
+
+  useEffect(() => {
+    if (isOpen && renderRequestId > 0 && completedRequestRef.current !== renderRequestId) {
+      completedRequestRef.current = renderRequestId;
+      void handleRenderVideo();
+    }
+  }, [handleRenderVideo, isOpen, renderRequestId]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -264,6 +300,14 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
                     <div style={{ width: `${progress}%`, height: '100%', background: 'linear-gradient(90deg, #3b82f6, #6366f1)', transition: 'width 0.1s linear' }} />
                   </div>
                 </div>
+              ) : exportError ? (
+                <div style={{ textAlign: 'center', padding: 20, background: 'rgba(239, 68, 68, 0.08)', borderRadius: 8, border: '1px solid rgba(239, 68, 68, 0.35)' }}>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: '#fca5a5', marginBottom: 8 }}>No se ha podido crear el MP4</div>
+                  <p style={{ margin: '0 0 14px', fontSize: 12, color: 'var(--am-text-dim)', lineHeight: 1.45 }}>{exportError}</p>
+                  <button className="btn btn-primary" style={{ padding: '9px 20px', fontSize: 13 }} onClick={handleRenderVideo}>
+                    <Play size={15} /> Reintentar renderizado MP4
+                  </button>
+                </div>
               ) : videoUrl ? (
                 <div style={{ textAlign: 'center', padding: 16, background: '#111218', borderRadius: 8, border: '1px solid var(--am-border)' }}>
                   <div style={{ fontSize: 14, fontWeight: 700, color: '#4ade80', marginBottom: 12 }}>
@@ -279,7 +323,7 @@ export const ExportModal: React.FC<ExportModalProps> = ({ isOpen, onClose, proje
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
                     <a
                       href={videoUrl}
-                      download={`${project.settings.name.toLowerCase().replace(/\s+/g, '_')}_1080x1920.mp4`}
+                      download={getFileName(project.settings.name)}
                       className="btn btn-primary"
                       style={{ padding: '9px 24px', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 8, fontWeight: 700 }}
                     >

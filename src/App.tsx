@@ -55,6 +55,7 @@ export function App() {
   const [isAIModalOpen, setIsAIModalOpen] = useState<boolean>(false);
   const [isTemplatesModalOpen, setIsTemplatesModalOpen] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
+  const [exportRequestId, setExportRequestId] = useState(0);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [leftTab, setLeftTab] = useState<'layers' | 'media' | 'audio'>('layers');
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('');
@@ -410,7 +411,13 @@ export function App() {
             <span>• 1080×1920 (9:16)</span>
           </div>
 
-          <button className="am-btn-primary" onClick={() => setIsExportModalOpen(true)}>
+          <button
+            className="am-btn-primary"
+            onClick={() => {
+              setExportRequestId((requestId) => requestId + 1);
+              setIsExportModalOpen(true);
+            }}
+          >
             <Share2 size={13} /> Export
           </button>
         </div>
@@ -577,6 +584,7 @@ export function App() {
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
         project={project}
+        renderRequestId={exportRequestId}
       />
     </div>
   );
